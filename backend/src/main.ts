@@ -63,10 +63,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document);
 
-  const port = process.env.API_PORT || 4000;
-  await app.listen(port);
-  bootstrapLogger.log(`🚀 Aegis AI Backend running on http://localhost:${port}`);
-  bootstrapLogger.log(`📚 Swagger docs at http://localhost:${port}/api/docs`);
+  const port = Number(process.env.PORT || process.env.API_PORT || 4000);
+  await app.listen(port, '0.0.0.0');
+  bootstrapLogger.log(`🚀 Aegis AI Backend running on http://0.0.0.0:${port}`);
+  bootstrapLogger.log(`📚 Swagger docs at http://0.0.0.0:${port}/api/docs`);
 }
 
 bootstrap();
