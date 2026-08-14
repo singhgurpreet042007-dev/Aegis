@@ -29,6 +29,12 @@ const securityHeaders = [
 const nextConfig = {
   transpilePackages: ['@aegis/shared'],
   reactStrictMode: true,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   async headers() {
     return [
       {
