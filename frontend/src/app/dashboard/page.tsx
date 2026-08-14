@@ -48,7 +48,7 @@ import { CalibrationModal } from '@/components/CalibrationModal';
 import { ConnectWebsiteModal } from '@/components/ConnectWebsiteModal';
 import { globalTelemetryTracker } from '@/lib/telemetry-tracker';
 import { fetchApi } from '@/lib/api-client';
-import { AegisTracker } from '@aegis/shared';
+import { AegisTracker } from '@/shared';
 import { useConnectedWebsite } from '@/lib/aegis-website';
 import { useSubscription } from '@/lib/useSubscription';
 import { GraphDetailModal, GraphPointData } from '@/components/GraphDetailModal';

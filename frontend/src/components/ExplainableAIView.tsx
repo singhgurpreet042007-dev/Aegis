@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrainCircuit, AlertTriangle, CheckCircle2, Globe, Lock, Crown, Activity } from 'lucide-react';
-import { ExplainableFactor } from '@aegis/shared';
+import { ExplainableFactor } from '@/shared';
 import { useConnectedWebsite } from '@/lib/aegis-website';
 import { useSubscription } from '@/lib/useSubscription';
 import { fetchApi } from '@/lib/api-client';

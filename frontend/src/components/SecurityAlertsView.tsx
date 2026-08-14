@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { fetchApi } from '@/lib/api-client';
 import { useConnectedWebsite } from '@/lib/aegis-website';
-import { SecurityIncident, RiskLevel } from '@aegis/shared';
+import { SecurityIncident, RiskLevel } from '@/shared';
 
 export function SecurityAlertsView() {
   const { connectedSite, isConnected } = useConnectedWebsite();

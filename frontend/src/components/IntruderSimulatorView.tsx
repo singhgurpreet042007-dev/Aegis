@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Play, Bot, Zap, CheckCircle2, UserCheck, ShieldAlert, Globe } from 'lucide-react';
-import { SimulationResult } from '@aegis/shared';
+import { SimulationResult } from '@/shared';
 import { useConnectedWebsite } from '@/lib/aegis-website';
 import { globalTelemetryTracker } from '@/lib/telemetry-tracker';
 

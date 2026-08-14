@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Globe, MapPin, RefreshCw } from 'lucide-react';
-import { ThreatMapPoint } from '@aegis/shared';
+import { ThreatMapPoint } from '@/shared';
 import { fetchApi } from '@/lib/api-client';
 import { useConnectedWebsite } from '@/lib/aegis-website';
 

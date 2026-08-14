@@ -21,7 +21,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { fetchApi } from '@/lib/api-client';
-import { SecurityPostureReport } from '@aegis/shared';
+import { SecurityPostureReport } from '@/shared';
 
 import { useSubscription } from '@/lib/useSubscription';
 

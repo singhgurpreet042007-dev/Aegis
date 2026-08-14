@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, MousePointer, Video, AlertTriangle, Globe } from 'lucide-react';
-import { SessionReplayFrame } from '@aegis/shared';
+import { SessionReplayFrame } from '@/shared';
 import { fetchApi } from '@/lib/api-client';
 import { useConnectedWebsite } from '@/lib/aegis-website';
 import { SessionMousePathCanvas } from './SessionMousePathCanvas';
