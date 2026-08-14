@@ -27,7 +27,6 @@ const securityHeaders = [
 ];
 
 const nextConfig = {
-  transpilePackages: ['@aegis/shared'],
   reactStrictMode: true,
   typescript: {
     ignoreBuildErrors: true,
