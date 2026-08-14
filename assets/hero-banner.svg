@@ -1,0 +1,125 @@
+<svg width="1200" height="420" viewBox="0 0 1200 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Background Gradients -->
+    <radialGradient id="bgGlow" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#00f2ff" stop-opacity="0.18"/>
+      <stop offset="45%" stop-color="#7928ca" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#05070f" stop-opacity="1"/>
+    </radialGradient>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2ff"/>
+      <stop offset="50%" stop-color="#7000ff"/>
+      <stop offset="100%" stop-color="#ff007a"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="40%" stop-color="#e0f7ff"/>
+      <stop offset="70%" stop-color="#00f2ff"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <linearGradient id="subTextGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#c084fc"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.8"/>
+    </linearGradient>
+    <!-- Glow Filters -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="subtleGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <!-- Grid Pattern -->
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.8" stroke-opacity="0.6"/>
+    </pattern>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="1200" height="420" rx="20" fill="#050711"/>
+  <rect width="1200" height="420" rx="20" fill="url(#grid)"/>
+  <rect width="1200" height="420" rx="20" fill="url(#bgGlow)"/>
+
+  <!-- Border Highlight -->
+  <rect x="1" y="1" width="1198" height="418" rx="19" fill="none" stroke="url(#shieldGrad)" stroke-width="1.5" stroke-opacity="0.4"/>
+
+  <!-- Cyber Grid / Decorative Lines -->
+  <path d="M 50 80 L 1150 80" stroke="#00f2ff" stroke-width="0.5" stroke-opacity="0.2" stroke-dasharray="8 8"/>
+  <path d="M 50 350 L 1150 350" stroke="#7928ca" stroke-width="0.5" stroke-opacity="0.2" stroke-dasharray="8 8"/>
+
+  <!-- Left Accent Shield Icon -->
+  <g transform="translate(100, 110)" filter="url(#glow)">
+    <!-- Outer Shield Contour -->
+    <path d="M70 10 L130 35 V105 C130 150 70 185 70 185 C70 185 10 150 10 105 V35 Z" fill="#0a0f24" stroke="url(#shieldGrad)" stroke-width="4"/>
+    <!-- Inner Core Pattern -->
+    <path d="M70 30 L115 50 V100 C115 135 70 162 70 162 C70 162 25 135 25 100 V50 Z" fill="url(#cardGrad)" stroke="#00f2ff" stroke-width="1.5" stroke-opacity="0.7"/>
+    <!-- Cyber AI Node in Shield -->
+    <circle cx="70" cy="90" r="16" fill="#00f2ff" fill-opacity="0.2" stroke="#00f2ff" stroke-width="2"/>
+    <circle cx="70" cy="90" r="6" fill="#00f2ff"/>
+    <!-- Radiating Pulses -->
+    <line x1="70" y1="65" x2="70" y2="74" stroke="#00f2ff" stroke-width="2" stroke-linecap="round"/>
+    <line x1="70" y1="106" x2="70" y2="115" stroke="#00f2ff" stroke-width="2" stroke-linecap="round"/>
+    <line x1="45" y1="90" x2="54" y2="90" stroke="#00f2ff" stroke-width="2" stroke-linecap="round"/>
+    <line x1="86" y1="90" x2="95" y2="90" stroke="#00f2ff" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Main Titles & Branding -->
+  <g transform="translate(280, 115)">
+    <!-- Top Pill Badge -->
+    <rect x="0" y="0" width="310" height="28" rx="14" fill="#00f2ff" fill-opacity="0.1" stroke="#00f2ff" stroke-width="1" stroke-opacity="0.5"/>
+    <circle cx="14" cy="14" r="4" fill="#00f2ff" filter="url(#subtleGlow)"/>
+    <text x="26" y="18" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="11" font-weight="700" fill="#00f2ff" letter-spacing="1.5">ZERO-TRUST BEHAVIORAL SECURITY</text>
+
+    <!-- Main Title -->
+    <text x="0" y="85" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="58" font-weight="900" fill="url(#textGrad)" letter-spacing="-1.5">
+      AEGIS <tspan fill="#00f2ff">AI</tspan>
+    </text>
+
+    <!-- Subtitle / Tagline -->
+    <text x="0" y="125" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="600" fill="url(#subTextGrad)" letter-spacing="0.2">
+      Continuous Behavioral Biometrics • Adaptive AI Risk Engine • Zero-Trust SecOps
+    </text>
+
+    <!-- Value Proposition -->
+    <text x="0" y="158" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="400" fill="#94a3b8" letter-spacing="0.3">
+      Real-Time Keystroke &amp; Mouse Telemetry • IsolationForest ML • Explainable SHAP XAI • Instant Bot Mitigation
+    </text>
+
+    <!-- Interactive Badges Pill Row -->
+    <g transform="translate(0, 180)">
+      <!-- Badge 1 -->
+      <rect x="0" y="0" width="130" height="30" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+      <circle cx="15" cy="15" r="4" fill="#22c55e"/>
+      <text x="26" y="19" font-family="sans-serif" font-size="11" font-weight="600" fill="#f8fafc">Next.js 15 &amp; React</text>
+
+      <!-- Badge 2 -->
+      <rect x="140" y="0" width="125" height="30" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+      <circle cx="155" cy="15" r="4" fill="#6366f1"/>
+      <text x="166" y="19" font-family="sans-serif" font-size="11" font-weight="600" fill="#f8fafc">NestJS &amp; Socket.io</text>
+
+      <!-- Badge 3 -->
+      <rect x="275" y="0" width="145" height="30" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+      <circle cx="290" cy="15" r="4" fill="#ec4899"/>
+      <text x="301" y="19" font-family="sans-serif" font-size="11" font-weight="600" fill="#f8fafc">PostgreSQL &amp; Prisma</text>
+
+      <!-- Badge 4 -->
+      <rect x="430" y="0" width="140" height="30" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+      <circle cx="445" cy="15" r="4" fill="#06b6d4"/>
+      <text x="456" y="19" font-family="sans-serif" font-size="11" font-weight="600" fill="#f8fafc">IsolationForest ML</text>
+    </g>
+  </g>
+
+  <!-- Right Hologram Gauge Graphic -->
+  <g transform="translate(1010, 185)" filter="url(#subtleGlow)">
+    <circle cx="0" cy="0" r="65" fill="none" stroke="#1e293b" stroke-width="8"/>
+    <circle cx="0" cy="0" r="65" fill="none" stroke="url(#shieldGrad)" stroke-width="8" stroke-dasharray="320" stroke-dashoffset="90" stroke-linecap="round"/>
+    <text x="0" y="8" font-family="sans-serif" font-size="24" font-weight="900" fill="#00f2ff" text-anchor="middle">99.8%</text>
+    <text x="0" y="26" font-family="sans-serif" font-size="9" font-weight="700" fill="#94a3b8" text-anchor="middle" letter-spacing="1">DEFENSE SCORE</text>
+  </g>
+</svg>

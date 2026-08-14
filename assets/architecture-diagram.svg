@@ -1,0 +1,76 @@
+<svg width="1000" height="380" viewBox="0 0 1000 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="boxGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f2ff"/>
+      <stop offset="100%" stop-color="#7000ff"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <rect width="1000" height="380" rx="16" fill="#080c1a" stroke="#1e293b" stroke-width="1"/>
+
+  <!-- Title -->
+  <text x="500" y="45" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="800" fill="#00f2ff" text-anchor="middle" letter-spacing="2">
+    AEGIS AI — CONTINUOUS ZERO-TRUST BIOMETRICS PIPELINE
+  </text>
+  <path d="M 350 58 L 650 58" stroke="url(#accentGrad)" stroke-width="1.5"/>
+
+  <!-- Step 1: Telemetry Capture -->
+  <g transform="translate(60, 95)" filter="url(#shadow)">
+    <rect width="240" height="220" rx="12" fill="url(#boxGrad1)" stroke="#38bdf8" stroke-width="1.5"/>
+    <rect x="0" y="0" width="240" height="36" rx="12" fill="#0284c7" fill-opacity="0.2"/>
+    <text x="120" y="24" font-family="sans-serif" font-size="13" font-weight="700" fill="#38bdf8" text-anchor="middle">1. Client Telemetry Capture</text>
+
+    <text x="20" y="65" font-family="sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">• Throttled Mouse Vectors (50ms)</text>
+    <text x="20" y="90" font-family="sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">• Keystroke Dwell (Hold Time)</text>
+    <text x="20" y="115" font-family="sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">• Flight Latency Jitter</text>
+    <text x="20" y="140" font-family="sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">• Device / Canvas Fingerprint</text>
+
+    <rect x="20" y="165" width="200" height="32" rx="6" fill="#0f172a" stroke="#334155"/>
+    <text x="120" y="185" font-family="monospace" font-size="10" font-weight="700" fill="#00f2ff" text-anchor="middle">telemetry-tracker.ts</text>
+  </g>
+
+  <!-- Flow Arrow 1 -->
+  <path d="M 310 205 L 365 205" stroke="#00f2ff" stroke-width="2.5" stroke-dasharray="4 4"/>
+  <polygon points="368,205 358,199 358,211" fill="#00f2ff"/>
+
+  <!-- Step 2: Gateway & Realtime Engine -->
+  <g transform="translate(380, 95)" filter="url(#shadow)">
+    <rect width="240" height="220" rx="12" fill="url(#boxGrad1)" stroke="#a855f7" stroke-width="1.5"/>
+    <rect x="0" y="0" width="240" height="36" rx="12" fill="#9333ea" fill-opacity="0.2"/>
+    <text x="120" y="24" font-family="sans-serif" font-size="13" font-weight="700" fill="#c084fc" text-anchor="middle">2. NestJS Engine &amp; DB</text>
+
+    <text x="20" y="65" font-family="sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">• WebSocket Gateway (Socket.io)</text>
+    <text x="20" y="90" font-family="sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">• 60s Baseline Calibration</text>
+    <text x="20" y="115" font-family="sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">• PostgreSQL &amp; Prisma Storage</text>
+    <text x="20" y="140" font-family="sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">• Gaussian Z-Score Engine</text>
+
+    <rect x="20" y="165" width="200" height="32" rx="6" fill="#0f172a" stroke="#334155"/>
+    <text x="120" y="185" font-family="monospace" font-size="10" font-weight="700" fill="#c084fc" text-anchor="middle">risk-engine.service.ts</text>
+  </g>
+
+  <!-- Flow Arrow 2 -->
+  <path d="M 630 205 L 685 205" stroke="#a855f7" stroke-width="2.5" stroke-dasharray="4 4"/>
+  <polygon points="688,205 678,199 678,211" fill="#a855f7"/>
+
+  <!-- Step 3: Mitigation & UI Live Response -->
+  <g transform="translate(700, 95)" filter="url(#shadow)">
+    <rect width="240" height="220" rx="12" fill="url(#boxGrad1)" stroke="#ec4899" stroke-width="1.5"/>
+    <rect x="0" y="0" width="240" height="36" rx="12" fill="#db2777" fill-opacity="0.2"/>
+    <text x="120" y="24" font-family="sans-serif" font-size="13" font-weight="700" fill="#f472b6" text-anchor="middle">3. Real-Time Zero-Trust Action</text>
+
+    <text x="20" y="65" font-family="sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">• Live Risk Gauge (<tspan fill="#22c55e">Low</tspan>/<tspan fill="#eab308">Med</tspan>/<tspan fill="#ef4444">High</tspan>)</text>
+    <text x="20" y="90" font-family="sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">• Adaptive MFA Challenge Trigger</text>
+    <text x="20" y="115" font-family="sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">• SHAP XAI Factor Attribution</text>
+    <text x="20" y="140" font-family="sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">• Instant Session Termination</text>
+
+    <rect x="20" y="165" width="200" height="32" rx="6" fill="#0f172a" stroke="#334155"/>
+    <text x="120" y="185" font-family="monospace" font-size="10" font-weight="700" fill="#f472b6" text-anchor="middle">AdaptiveMfaModal.tsx</text>
+  </g>
+</svg>

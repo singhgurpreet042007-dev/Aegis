@@ -1,62 +1,127 @@
-# 🛡️ AegisAI — Zero-Trust Behavioral Security Platform
+<div align="center">
 
-> **Real-Time Behavioral Biometrics, Adaptive AI Risk Scoring & Zero-Trust Threat Mitigation Engine.**
+  <img src="assets/hero-banner.svg" alt="Aegis AI Banner" width="100%" />
 
-[![CI](https://github.com/aegis-ai/aegis-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/aegis-ai/aegis-ai/actions/workflows/ci.yml)
-[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
+  <br/><br/>
 
----
+  <h1>
+    <b>🛡️ 𝕬𝖊𝖌𝖎𝖘 𝕬𝕴</b>
+  </h1>
+  <p>
+    <b>Autonomous Zero-Trust Behavioral Security &amp; Continuous Biometrics Intelligence Platform</b>
+  </p>
 
-## ⚡ Core Features (Behavioral Biometrics Core Module)
+  <p>
+    <a href="#-key-capabilities"><img src="https://img.shields.io/badge/Architecture-Turborepo%20Monorepo-00f2ff?style=for-the-badge&logo=turborepo&logoColor=white" alt="Turborepo" /></a>
+    <a href="#-tech-stack"><img src="https://img.shields.io/badge/Frontend-Next.js%2015%20%7C%20React%2019-7928ca?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js" /></a>
+    <a href="#-tech-stack"><img src="https://img.shields.io/badge/Backend-NestJS%2010%20%7C%20Socket.io-ff007a?style=for-the-badge&logo=nestjs&logoColor=white" alt="NestJS" /></a>
+    <a href="#-tech-stack"><img src="https://img.shields.io/badge/Database-PostgreSQL%20%7C%20Prisma-3b82f6?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma" /></a>
+    <a href="#-license"><img src="https://img.shields.io/badge/Security-Zero--Trust%20Enforced-10b981?style=for-the-badge&logo=auth0&logoColor=white" alt="Zero Trust" /></a>
+  </p>
 
-AegisAI goes beyond static website audits to provide real-time behavioral biometric tracking, adaptive ML anomaly detection, and automated threat mitigation:
+  <p>
+    <a href="#-overview">Overview</a> •
+    <a href="#-key-capabilities">Key Capabilities</a> •
+    <a href="#-architecture-pipeline">Architecture</a> •
+    <a href="#-human-vs-bot-biometrics">Biometrics Visualizer</a> •
+    <a href="#-developer-sdk">Developer SDK</a> •
+    <a href="#-quick-start">Quick Start</a>
+  </p>
 
-### 1. Live Behavioral Tracking & 60-Second Baseline Calibration
-- **Lightweight Telemetry Tracker**: Captures throttled `mousemove` vectors ($50-100\text{ms}$), keypress dwell times, and flight latency jitter over WebSockets.
-- **60-Second Calibration Mode**: Dedicated enrolment mode allowing users to record their natural typing rhythm and cursor curvature into a PostgreSQL `BehavioralBaseline` DB record.
-- **Zero Mock Policy**: Displays `"No baseline yet — run calibration"` when uncalibrated, with zero hardcoded default numbers.
-
-### 2. Real-Time Risk Score Engine
-- **Z-Score & IsolationForest Pipeline**: Computes $z = \frac{|\text{cur} - \text{baseline\_mean}|}{\text{baseline\_std}}$ alongside IsolationForest trees on active session telemetry.
-- **PostgreSQL Assessment Storage**: Saves every assessment as a `RiskAssessment` DB record.
-- **Live WebSocket Gauge**: Streams real-time risk updates (`risk_score_update`) to dynamically update UI risk meters (Green $<30\%$, Yellow $30-70\%$, Red $>70\%$).
-
-### 3. Authentic Bot Attack Simulator
-- **Programmatic Bot Dispatcher**: Dispatches synthetic straight diagonal $16\text{ms}$ mouse vectors and $10\text{ms}$ zero-jitter keypresses through the exact same WebSocket pipeline as real users.
-- **Organic Anomaly Spikes**: Robotic straightness (index $= 1.0$) and zero jitter cause $Z$-scores to spike ($>0.85$), turning the Risk Gauge RED organically.
-
-### 4. Explainable AI (SHAP XAI) Panel
-- **Feature Attribution Breakdown**: Computes feature importance weights for robotic linearity, dwell shifts, and flight jitter.
-- **DB-Backed Attribution Reports**: Reads attributions directly from `RiskAssessment.explainableFactors` DB JSON.
-
-### 5. Session Mouse Path Canvas Visualization
-- **Raw Coordinate Storage**: Stores raw $(x, y, t)$ coordinates in `BehavioralSession.mousePoints` in PostgreSQL.
-- **Side-by-Side Canvas Visualizer**: Renders smooth green curved arcs for human sessions vs rigid red diagonal lines for bot attacks side-by-side.
+</div>
 
 ---
 
-## 💻 Developer SDK & Integration Guide
+## 🌐 𝕺𝖛𝖊𝖗𝖛𝖎𝖊𝖜
 
-### 1. One-Line Script Tag Integration (HTML / Web Apps)
-Embed this lightweight script tag inside your web application's `<head>` tag:
+> **Traditional authentication stops at login.** Once credentials are submitted, compromised sessions, hijacked cookies, and automated bots operate undetected.
+
+**Aegis AI** solves this by establishing **Continuous Behavioral Biometric Authentication**. By analyzing micro-patterns in human interactions—such as keystroke dwell latency, flight-time jitter, mouse trajectory curvature, and device hardware signatures—Aegis AI computes a real-time dynamic risk score. If an unauthorized human takeover or automated bot attack is detected, the platform triggers **Adaptive Zero-Trust MFA challenges** or terminates the session instantly.
+
+---
+
+## ⚡ 𝕶𝖊𝖞 𝕮𝖆𝖕𝖆𝖇𝖎𝖑𝖎𝖙𝖎𝖊𝖘
+
+<table>
+  <tr>
+    <td width="50%">
+      <h3>🖱️ 1. Real-Time Telemetry &amp; 60s Calibration</h3>
+      <ul>
+        <li><b>High-Frequency Micro-Telemetry</b>: Captures throttled mouse vectors (50ms), keystroke dwell &amp; flight times via WebSockets.</li>
+        <li><b>Zero-Mock Policy</b>: Baseline calibration profiles stored directly into database models with natural mathematical variances.</li>
+      </ul>
+    </td>
+    <td width="50%">
+      <h3>📈 2. Adaptive Risk Scoring Engine</h3>
+      <ul>
+        <li><b>Gaussian Z-Score &amp; ML Pipelines</b>: Computes statistical standard deviations alongside IsolationForest anomaly scores.</li>
+        <li><b>Live WebSocket Gauge</b>: Real-time dynamic gauge transitions: 🟢 <i>Low (&lt;30%)</i>, 🟡 <i>Medium (30-70%)</i>, 🔴 <i>Critical (&gt;70%)</i>.</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <h3>🤖 3. Authentic Bot &amp; Intruder Simulator</h3>
+      <ul>
+        <li><b>Red-Team Simulation Suite</b>: Dispatch synthetic linear 16ms mouse sweeps and zero-jitter macro scripts.</li>
+        <li><b>Organic Anomaly Spikes</b>: Triggers legitimate zero-trust defensive responses with real-time UI notifications.</li>
+      </ul>
+    </td>
+    <td width="50%">
+      <h3>🔍 4. Explainable AI (SHAP XAI) Panel</h3>
+      <ul>
+        <li><b>Transparent Feature Attribution</b>: Breaks down risk factors by typing dwell, flight jitter, and trajectory straightness.</li>
+        <li><b>Audit-Ready Compliance</b>: Forensic telemetry logs for regulatory zero-trust compliance.</li>
+      </ul>
+    </td>
+  </tr>
+</table>
+
+---
+
+## 🏛️ 𝕬𝖗𝖈𝖍𝖎𝖙𝖊𝖈𝖙𝖚𝖗𝖊 𝕻𝖎𝖕𝖊𝖑𝖎𝖓𝖊
+
+<div align="center">
+  <img src="assets/architecture-diagram.svg" alt="Architecture Diagram" width="100%" />
+</div>
+
+---
+
+## 🔬 𝕳𝖚𝖒𝖆𝖓 𝖛𝖘 𝕭𝖔𝖙 𝕭𝖎𝖔𝖒𝖊𝖙𝖗𝖎𝖈𝖘
+
+Aegis AI contrasts organic human neuromuscular movements against mechanical script vectors in real time:
+
+<div align="center">
+  <img src="assets/biometric-comparison.svg" alt="Human vs Bot Biometrics" width="100%" />
+</div>
+
+---
+
+## 💻 𝕯𝖊𝖛𝖊𝖑𝖔𝖕𝖊𝖗 𝕾𝕯𝕶 &amp; 𝕴𝖓𝖙𝖊𝖌𝖗𝖆𝖙𝖎𝖔𝖓
+
+### 1. HTML Script Tag Integration
+Drop this lightweight snippet into your website `<head>`:
 
 ```html
-<script src="http://localhost:3001/aegis-tracker.js" data-site-id="aegis_site_prod_99182" async></script>
+<script 
+  src="https://cdn.aegisai.security/v1/aegis-tracker.min.js" 
+  data-site-id="aegis_site_prod_8921" 
+  async>
+</script>
 ```
 
-### 2. React / Next.js SDK Integration
-Import and initialize the `globalTelemetryTracker` in your application root:
+### 2. Next.js / React Integration
 
 ```typescript
 import { globalTelemetryTracker } from '@/lib/telemetry-tracker';
 
-// Initialize session tracking
+// Initialize session tracking on auth success
 globalTelemetryTracker.init({
-  userId: 'usr_active_email@domain.com',
-  sessionId: 'sess_live_991',
+  userId: 'user_99182',
+  sessionId: 'sess_live_alpha_01',
 });
 
-// Trigger Red Team Bot Attack Simulation programmatically
+// Programmatic Bot Simulator for Penetration Testing
 globalTelemetryTracker.simulateBotAttackBatch({
   pointCount: 50,
   startX: 80,
@@ -66,33 +131,78 @@ globalTelemetryTracker.simulateBotAttackBatch({
 
 ---
 
-## 🏗️ Architecture
+## 🛠️ 𝕿𝖊𝖈𝖍 𝕾𝖙𝖆𝖈𝖐
 
-AegisAI is built as a Turborepo monorepo:
+<div align="center">
 
-| Package | Stack | Description |
-| :--- | :--- | :--- |
-| `frontend/` | Next.js 15, React 19, Tailwind CSS | Real-Time SecOps Dashboard & Client SDK |
-| `backend/` | NestJS 10, Socket.io, Prisma 5, PostgreSQL | REST APIs & WebSocket Gateway |
-| `ai-risk-engine/` | Python, IsolationForest, SHAP | ML Anomaly Scoring Microservice |
-| `database/` | Prisma, PostgreSQL 16 | Relational DB Schema (`BehavioralBaseline`, `RiskAssessment`, `SecurityIncident`) |
-| `shared/` | TypeScript | Shared Types, DTOs, & Enums |
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend** | `Next.js 15` • `React 19` • `TailwindCSS` • `Lucide Icons` • `Framer Motion` |
+| **Backend API** | `NestJS 10` • `TypeScript` • `Socket.io Gateway` • `Passport JWT` |
+| **Database & Cache** | `PostgreSQL 16` • `Prisma ORM` • `Redis Pub/Sub` |
+| **Telemetry & SDK** | `Biometric Web Workers` • `Canvas Session Replay` • `Sha256 Fingerprinting` |
+| **DevOps & Monorepo** | `Turborepo` • `Docker Compose` • `GitHub Actions CI/CD` |
+
+</div>
 
 ---
 
-## 🚀 Quick Start
+## 🚀 𝕼𝖚𝖎𝖈𝖐 𝕾𝖙𝖆𝖗𝖙
+
+### Prerequisites
+- **Node.js**: `v18.0+` or `v20.0+`
+- **pnpm** or **npm**
+- **PostgreSQL** & **Redis** (or Docker)
+
+### Installation & Run
 
 ```bash
-# Clone repository
-git clone https://github.com/aegis-ai/aegis-ai.git
-cd aegis-ai
+# 1. Clone repository
+git clone https://github.com/singhgurpreet042007-dev/Aegis.git
+cd Aegis
 
-# Start backend NestJS server (Port 3000)
-cd backend && npm run dev
+# 2. Install dependencies
+npm install
 
-# Start frontend Next.js server (Port 3001)
+# 3. Start Backend NestJS Server (Port 3000)
+cd backend && npm run start:dev
+
+# 4. In a new terminal, Start Frontend Next.js Dashboard (Port 3001)
 cd frontend && npm run dev
 ```
 
-- **Dashboard**: [http://localhost:3001/dashboard](http://localhost:3001/dashboard)
-- **Backend Swagger API Docs**: [http://localhost:3000/api](http://localhost:3000/api)
+- 🖥️ **SecOps Web Dashboard**: [http://localhost:3001/dashboard](http://localhost:3001/dashboard)
+- 📡 **Backend REST & Swagger API**: [http://localhost:3000/api](http://localhost:3000/api)
+
+---
+
+## 📂 𝕻𝖗𝖔𝖏𝖊𝖈𝖙 𝕾𝖙𝖗𝖚𝖈𝖙𝖚𝖗𝖊
+
+```ascii
+Aegis-AI/
+├── assets/                    # SVG Architecture & Hero Graphics
+│   ├── hero-banner.svg
+│   ├── architecture-diagram.svg
+│   └── biometric-comparison.svg
+├── frontend/                  # Next.js 15 Dashboard & SecOps UI
+│   ├── src/app/               # App Router Pages (Dashboard, Auth)
+│   ├── src/components/        # Biometric Visualizers, Risk Gauges
+│   └── src/lib/               # Telemetry Tracking SDK
+├── backend/                   # NestJS API & WebSocket Gateway
+│   ├── src/modules/           # Biometrics, Risk, Sentinel, Auth
+│   └── src/common/            # Zero-Trust Guards & Filters
+├── database/                  # Prisma Schema & PostgreSQL Seeds
+├── shared/                    # TypeScript DTOs, Enums & SDK
+├── docker/                    # Docker Compose Infrastructure
+└── README.md                  # Project Documentation
+```
+
+---
+
+<div align="center">
+
+  <b>🛡️ Aegis AI — Built for Autonomous Zero-Trust Security.</b>
+
+  <sub>Designed and engineered with passion. All rights reserved.</sub>
+
+</div>
