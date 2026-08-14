@@ -20,10 +20,10 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@aegis/shared": ["../shared/src/index.ts", "../shared/src/index"],
-      "@aegis/shared/*": ["../shared/src/*"]
+      "@aegis/shared": ["./src/shared/index.ts", "./src/shared/index"],
+      "@aegis/shared/*": ["./src/shared/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../shared/src/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }
