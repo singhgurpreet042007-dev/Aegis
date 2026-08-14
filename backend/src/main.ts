@@ -18,7 +18,18 @@ async function bootstrap() {
   // Security
   app.use(helmet());
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:3001', process.env.APP_URL || ''].filter(Boolean),
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (
+        origin.includes('localhost') ||
+        origin.includes('vercel.app') ||
+        origin === process.env.APP_URL ||
+        origin === process.env.FRONTEND_URL
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Workspace-Id'],
