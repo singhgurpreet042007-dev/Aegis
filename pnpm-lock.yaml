@@ -196,9 +196,6 @@ importers:
 
   frontend:
     dependencies:
-      '@aegis/shared':
-        specifier: workspace:*
-        version: link:../shared
       clsx:
         specifier: ^2.1.0
         version: 2.1.1
