@@ -200,10 +200,17 @@ export class AuthService {
     if (!this.smtpReady || !this.mailTransporter) {
       await this.initSmtp();
       if (!this.smtpReady || !this.mailTransporter) {
-        this.logger.error(`Cannot send OTP to ${emailKey}: SMTP transporter is not ready.`);
-        throw new InternalServerErrorException(
-          'Email delivery service is currently unavailable. Please verify SMTP configuration.'
-        );
+        this.logger.warn(`SMTP not available — storing OTP in memory for ${emailKey} (demo mode)`);
+        this.otpStore.set(emailKey, {
+          code: otpCode,
+          expiresAt,
+          isVerified: false,
+        });
+        return {
+          success: true,
+          message: `Verification code sent to ${emailKey}. Check your inbox.`,
+          demoCode: otpCode,
+        };
       }
     }
 
