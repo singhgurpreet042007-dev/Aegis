@@ -1,0 +1,24 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "aegis-backend"
+    static_configs:
+      - targets: ["backend:4000"]
+    metrics_path: /api/metrics
+    scrape_interval: 10s
+
+  - job_name: "aegis-workers"
+    static_configs:
+      - targets: ["workers:4100"]
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  - job_name: "redis"
+    static_configs:
+      - targets: ["redis-exporter:9121"]
+
+  - job_name: "postgresql"
+    static_configs:
+      - targets: ["postgres-exporter:9187"]

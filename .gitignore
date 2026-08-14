@@ -1,0 +1,68 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+.next/
+dist/
+out/
+build/
+.turbo/
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+
+# Prisma & SQLite databases
+database/prisma/migrations/**/migration_lock.toml
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+dev.db
+database/prisma/dev.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Testing
+coverage/
+test-results/
+playwright-report/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Docker
+docker/data/
+
+# Generated
+*.generated.ts
+prisma/generated/
+
+# Misc
+*.tsbuildinfo
+.eslintcache
+.prettiercache
+.impeccable/
+
+# Proprietary Core AI Engine & Models (Protected Source Code)
+ai-risk-engine/
+
+# Internal PDFs & Documentation
+*.pdf
+Aegis_AI_Project_Summary.pdf

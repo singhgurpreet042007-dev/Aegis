@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: aegis-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: aegis_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: aegis-redis
+    ports:
+      - '6379:6379'
+
+  ai-risk-engine:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.ai-risk-engine
+    container_name: aegis-ai-risk-engine
+    ports:
+      - '8000:8000'
+    environment:
+      - PORT=8000
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    container_name: aegis-backend
+    ports:
+      - '3001:3001'
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/aegis_db?schema=public
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - RISK_ENGINE_URL=http://ai-risk-engine:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      ai-risk-engine:
+        condition: service_started
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+    container_name: aegis-frontend
+    ports:
+      - '3000:3000'
+    environment:
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:3001
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

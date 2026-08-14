@@ -1,0 +1,8 @@
+packages:
+  - "frontend"
+  - "backend"
+  - "ai"
+  - "workers"
+  - "shared"
+  - "database"
+  - "packages/*"

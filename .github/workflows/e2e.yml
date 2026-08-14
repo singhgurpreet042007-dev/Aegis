@@ -1,0 +1,63 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  e2e:
+    name: Playwright E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: aegis
+          POSTGRES_PASSWORD: aegis_test
+          POSTGRES_DB: aegis_e2e
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:7.2-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "9"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Setup Database
+        run: pnpm db:migrate && pnpm db:seed
+        env:
+          DATABASE_URL: postgresql://aegis:aegis_test@localhost:5432/aegis_e2e
+
+      - name: Run E2E Tests
+        run: pnpm test:e2e
+        env:
+          DATABASE_URL: postgresql://aegis:aegis_test@localhost:5432/aegis_e2e
+          REDIS_URL: redis://localhost:6379
+          APP_URL: http://localhost:3000
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

@@ -1,0 +1,307 @@
+// ═══════════════════════════════════════════════════════════
+// Aegis AI — Prisma Schema
+// ═══════════════════════════════════════════════════════════
+// Datasource: PostgreSQL (production-grade)
+// To switch providers: set DATABASE_URL in .env.development
+// For local dev without Postgres: set provider = "sqlite"
+//   and DATABASE_URL = "file:./dev.db"
+// ═══════════════════════════════════════════════════════════
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id               String       @id @default(uuid())
+  name             String
+  slug             String       @unique
+  tier             String       @default("STARTER")
+  stripeCustomerId String?      @unique
+  customDomain     String?      @unique
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @default(now()) @updatedAt
+  workspaces       Workspace[]
+}
+
+model User {
+  id                 String               @id @default(uuid())
+  email              String               @unique
+  passwordHash       String?
+  fullName           String
+  avatarUrl          String?
+  role               String               @default("SECURITY_OFFICER")
+  status             String               @default("PENDING_VERIFICATION")
+  mfaType            String               @default("NONE")
+  mfaSecretEncrypted String?
+  lastLoginAt        DateTime?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @default(now()) @updatedAt
+  workspaceMembers   WorkspaceMember[]
+  behavioralBaselines BehavioralBaseline[]
+  behavioralSessions  BehavioralSession[]
+  deviceFingerprints  DeviceFingerprint[]
+  riskAssessments     RiskAssessment[]
+  securityAlerts      SecurityAlert[]
+  securityIncidents   SecurityIncident[]
+  trustedContexts     TrustedContext[]
+}
+
+model Workspace {
+  id             String            @id @default(uuid())
+  organizationId String
+  name           String
+  slug           String
+  creditBalance  Float             @default(1000.0)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @default(now()) @updatedAt
+  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  members        WorkspaceMember[]
+}
+
+model WorkspaceMember {
+  id          String    @id @default(uuid())
+  workspaceId String
+  userId      String
+  role        String    @default("MEMBER")
+  createdAt   DateTime  @default(now())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+}
+
+model BehavioralBaseline {
+  id                  String   @id @default(uuid())
+  userId              String   @unique
+  keystrokeDwellMean  Float    @default(0.0)
+  keystrokeDwellStd   Float    @default(0.0)
+  keystrokeFlightMean Float    @default(0.0)
+  keystrokeFlightStd  Float    @default(0.0)
+  mouseVelocityMean   Float    @default(0.0)
+  mouseVelocityStd    Float    @default(0.0)
+  mouseJerkMean       Float    @default(0.0)
+  mouseCurvatureMean  Float    @default(0.0)
+  sampleCount         Int      @default(0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @default(now()) @updatedAt
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model BehavioralSession {
+  id                String               @id @default(uuid())
+  userId            String
+  sessionToken      String               @unique
+  deviceFingerprint String
+  ipAddress         String
+  location          String
+  currentRiskScore  Float                @default(0.08)
+  riskLevel         String               @default("LOW")
+  mfaState          String               @default("NONE")
+  isSimulated       Boolean              @default(false)
+  simulationType    String?
+  mousePoints       String?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @default(now()) @updatedAt
+  user              User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  riskAssessments   RiskAssessment[]
+  securityAlerts    SecurityAlert[]
+  sessionReplays    SessionReplayEvent[]
+}
+
+model DeviceFingerprint {
+  id              String   @id @default(uuid())
+  userId          String
+  fingerprintHash String   @unique
+  browser         String
+  os              String
+  deviceType      String
+  isTrusted       Boolean  @default(true)
+  firstSeenAt     DateTime @default(now())
+  lastSeenAt      DateTime @default(now()) @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RiskAssessment {
+  id                 String            @id @default(uuid())
+  sessionId          String
+  userId             String
+  overallRiskScore   Float
+  riskLevel          String
+  anomalyScore       Float
+  explainableFactors String
+  adaptiveMfaTrigger Boolean           @default(false)
+  timestamp          DateTime          @default(now())
+  session            BehavioralSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  securityAlerts     SecurityAlert[]
+}
+
+model SecurityAlert {
+  id               String            @id @default(uuid())
+  sessionId        String
+  userId           String
+  riskAssessmentId String?
+  title            String
+  description      String
+  severity         String            @default("HIGH")
+  status           String            @default("NEW")
+  metadata         String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @default(now()) @updatedAt
+  session          BehavioralSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  riskAssessment   RiskAssessment?   @relation(fields: [riskAssessmentId], references: [id], onDelete: SetNull)
+}
+
+model SessionReplayEvent {
+  id        String            @id @default(uuid())
+  sessionId String
+  sequence  Int
+  isAnomaly Boolean           @default(false)
+  eventData String
+  createdAt DateTime          @default(now())
+  session   BehavioralSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model ThreatLog {
+  id        String   @id @default(uuid())
+  lat       Float
+  lng       Float
+  location  String
+  riskScore Float
+  type      String
+  timestamp DateTime @default(now())
+}
+
+model SecurityIncident {
+  id                String               @id @default(uuid())
+  domain            String
+  targetUrl         String               @default("")
+  eventType         String               @default("SUSPICIOUS_LOGIN")
+  severity          String               @default("HIGH")
+  riskScore         Float                @default(0.85)
+  whySuspicious     String?
+  verificationState String               @default("PENDING")
+  userResponse      String?
+  userRespondedAt   DateTime?
+  deviceInfo        String               @default("Unknown Device")
+  browser           String?
+  os                String?
+  ipAddress         String               @default("0.0.0.0")
+  location          String               @default("Unknown Location")
+  metadata          String?
+  remediationSteps  String?
+  notificationSent  Boolean              @default(false)
+  notificationType  String?
+  notifiedAt        DateTime?
+  userId            String?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @default(now()) @updatedAt
+  user              User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
+  auditTrail        IncidentAuditEntry[]
+}
+
+model IncidentAuditEntry {
+  id         String           @id @default(uuid())
+  incidentId String
+  action     String
+  actor      String
+  note       String
+  timestamp  DateTime         @default(now())
+  incident   SecurityIncident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+}
+
+model TrustedContext {
+  id              String   @id @default(uuid())
+  domain          String
+  userId          String?
+  fingerprintHash String
+  browser         String?
+  os              String?
+  ipAddress       String?
+  location        String?
+  isTrusted       Boolean  @default(true)
+  verifiedAt      DateTime @default(now())
+  lastSeenAt      DateTime @default(now()) @updatedAt
+  user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([domain, fingerprintHash])
+}
+
+model SecurityTimelineEvent {
+  id          String   @id @default(uuid())
+  domain      String
+  eventType   String
+  title       String
+  description String
+  severity    String   @default("INFO")
+  createdAt   DateTime @default(now())
+}
+
+// ── Time-series event store ────────────────────────────────────────────────
+// Records every telemetry ingestion and risk score change for timeline view.
+model TelemetryEvent {
+  id          String   @id @default(uuid())
+  sessionId   String
+  userId      String
+  eventType   String   // TELEMETRY_INGESTED | RISK_SCORE_CHANGED | RISK_DECAYED | ALERT_TRIGGERED
+  riskScore   Float?
+  riskLevel   String?
+  features    String?  // JSON blob of computed features for this event
+  metadata    String?  // JSON blob of any extra context
+  createdAt   DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// ── Immutable Security Audit Log ───────────────────────────────────────────
+// Records every security-relevant action with actor, resource, and IP.
+// This table is append-only — no rows are ever updated or deleted.
+model AuditLog {
+  id           String   @id @default(uuid())
+  actor        String   // userId or "SYSTEM"
+  actorEmail   String?
+  action       String   // LOGIN | LOGOUT | INCIDENT_VERIFIED | POLICY_CHANGED | SESSION_REVOKED | TRUST_ADDED | TRUST_REVOKED
+  resourceType String?  // "SecurityIncident" | "TrustedContext" | "PolicyRule" | "User"
+  resourceId   String?  // ID of the affected resource
+  outcome      String   @default("SUCCESS") // SUCCESS | FAILURE
+  ipAddress    String?
+  userAgent    String?
+  metadata     String?  // JSON blob for additional context
+  timestamp    DateTime @default(now())
+
+  @@index([actor])
+  @@index([action])
+  @@index([timestamp])
+}
+
+// ── Website Scan Results ───────────────────────────────────────────────────
+// Persists every URL scan result to DB (replaces in-memory only store).
+model WebsiteScan {
+  id               String   @id @default(uuid())
+  domain           String
+  targetUrl        String
+  httpStatus       Int?
+  latencyMs        Int?
+  healthScore      Float    @default(0.0)
+  riskLevel        String   @default("LOW")
+  sslValid         Boolean  @default(false)
+  sslExpiresAt     DateTime?
+  headersScore     Float    @default(0.0)
+  dnsResolves      Boolean  @default(false)
+  securityHeaders  String?  // JSON: { "x-frame-options": "DENY", ... }
+  vulnerabilities  String?  // JSON array of findings
+  rawReport        String?  // Full JSON snapshot of the SecurityPostureReport
+  scanTriggeredBy  String?  // userId of who triggered the scan
+  createdAt        DateTime @default(now())
+
+  @@index([domain])
+  @@index([createdAt])
+}
