@@ -92,7 +92,7 @@ export class TelemetryTracker {
     this.isBaseline = options.isBaseline ?? false;
     this.isTracking = true;
 
-    const wsUrl = options.serverUrl || process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3000';
+    const wsUrl = options.serverUrl || process.env.NEXT_PUBLIC_WS_URL || 'https://aegis-backend-rm7s.onrender.com';
     
     try {
       this.socket = io(`${wsUrl}/biometrics`, {
@@ -232,7 +232,7 @@ export class TelemetryTracker {
       this.socket.emit('telemetry_batch', payload);
     } else {
       // HTTP fallback
-      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://aegis-backend-rm7s.onrender.com/api';
       fetch(`${backendUrl}/v1/biometrics/ingest`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -312,7 +312,7 @@ export class TelemetryTracker {
     if (this.socket && this.socket.connected) {
       this.socket.emit('telemetry_batch', payload);
     } else {
-      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://aegis-backend-rm7s.onrender.com/api';
       fetch(`${backendUrl}/v1/biometrics/ingest`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
