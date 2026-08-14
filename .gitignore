@@ -11,10 +11,14 @@ build/
 
 # Environment files
 .env
+.env*
+*.env*
 .env.local
 .env.development
 .env.production
 .env.*.local
+.env.example
+config/env/
 
 # Prisma & SQLite databases
 database/prisma/migrations/**/migration_lock.toml
