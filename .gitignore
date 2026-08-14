@@ -71,3 +71,6 @@ ai-risk-engine/
 *.pdf
 Aegis_AI_Project_Summary.pdf
 /public/
+
+# GitHub Workflows & Actions
+.github/workflows/
