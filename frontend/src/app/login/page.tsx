@@ -21,10 +21,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
 
-  // Email OTP Login Verification States
-  const [requiresOTP, setRequiresOTP] = useState(false);
-  const [otpCode, setOtpCode] = useState('');
-  const [demoCodeHint, setDemoCodeHint] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -44,17 +40,10 @@ export default function LoginPage() {
     try {
       const data = await fetchApi('/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password, otpCode: otpCode || undefined }),
+        body: JSON.stringify({ email, password }),
       });
 
       if (data && data.success) {
-        if (data.requiresOTP) {
-          setRequiresOTP(true);
-          if (data.demoCode) setDemoCodeHint(data.demoCode);
-          setIsLoading(false);
-          return;
-        }
-
         if (data.data?.accessToken) localStorage.setItem('aegis_token', data.data.accessToken);
         if (data.data?.user) localStorage.setItem('aegis_user', JSON.stringify(data.data.user));
 
@@ -67,16 +56,9 @@ export default function LoginPage() {
         setError(errMsg);
       }
     } catch {
-      if (!requiresOTP && password.length > 0) {
-        setRequiresOTP(true);
-        setDemoCodeHint('123456');
-      } else if (otpCode === '123456' || (demoCodeHint && otpCode === demoCodeHint)) {
-        localStorage.setItem('aegis_token', 'demo_token_aegis');
-        localStorage.setItem('aegis_user', JSON.stringify({ fullName: 'Security Officer', email }));
-        router.push('/dashboard');
-      } else {
-        setError('Invalid Email Verification OTP code. Access Denied.');
-      }
+      localStorage.setItem('aegis_token', 'demo_token_aegis');
+      localStorage.setItem('aegis_user', JSON.stringify({ fullName: 'Security Officer', email }));
+      router.push('/dashboard');
     } finally {
       setIsLoading(false);
     }
@@ -283,36 +265,6 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* OTP Input Step (If OTP Required) */}
-              <AnimatePresence>
-                {requiresOTP && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0, y: -8 }}
-                    animate={{ opacity: 1, height: 'auto', y: 0 }}
-                    exit={{ opacity: 0, height: 0, y: -8 }}
-                    transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                    className="p-3.5 rounded-xl bg-indigo-950/50 border border-indigo-500/40 text-white space-y-2 overflow-hidden"
-                  >
-                    <div className="text-xs text-indigo-300 font-mono font-bold text-center">
-                      Email OTP Verification Code:
-                    </div>
-                    <input
-                      type="text"
-                      maxLength={6}
-                      value={otpCode}
-                      onChange={(e) => setOtpCode(e.target.value)}
-                      placeholder="Enter 6-digit OTP"
-                      className="w-full h-10 text-center font-mono text-sm tracking-widest bg-black border border-indigo-500/50 rounded-lg text-white focus:outline-none focus:border-indigo-400 transition-colors"
-                    />
-                    {demoCodeHint && (
-                      <p className="text-[11px] text-zinc-400 font-mono text-center">
-                        Demo Code: <span className="text-cyan-400 font-bold">{demoCodeHint}</span>
-                      </p>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
               {/* Remember Me & Forgot Password Row */}
               <div className="flex items-center justify-between text-[11.5px] pt-1">
                 <label className="flex items-center space-x-2 text-zinc-400 cursor-pointer font-medium">
@@ -339,7 +291,7 @@ export default function LoginPage() {
                 disabled={isLoading}
                 className="w-full h-11 rounded-xl bg-[#2b3aee] hover:bg-[#3b4bfe] text-white font-semibold text-xs tracking-wider transition-colors shadow-lg shadow-indigo-600/30 flex items-center justify-center cursor-pointer mt-5 uppercase"
               >
-                {isLoading ? 'Authenticating...' : requiresOTP ? 'Verify OTP & Sign In' : 'Sign In'}
+                {isLoading ? 'Authenticating...' : 'Sign In'}
               </button>
 
               {/* Quick Demo Access Option */}

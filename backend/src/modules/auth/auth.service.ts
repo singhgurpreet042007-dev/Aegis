@@ -391,13 +391,7 @@ export class AuthService {
   async register(dto: RegisterDto & { otpCode?: string }) {
     const emailKey = dto.email.toLowerCase().trim();
 
-    // Verify OTP first
-    const providedCode = dto.otpCode?.toString().trim();
-    const stored = this.otpStore.get(emailKey);
-
-    if (!stored || (!stored.isVerified && stored.code !== providedCode)) {
-      throw new BadRequestException('Please verify your email with the 6-digit OTP code before completing registration.');
-    }
+    // OTP verification disabled — direct registration
 
     if (this.prisma.isConnected) {
       try {
@@ -523,25 +517,7 @@ export class AuthService {
             throw new UnauthorizedException('Invalid email or password');
           }
 
-          // Check if OTP code provided for step 2
-          if (!dto.otpCode) {
-            const sendResult = await this.sendEmailOtp(emailKey);
-            return {
-              success: true,
-              requiresOTP: true,
-              message: sendResult.message,
-            };
-          }
-
-          // Verify OTP
-          const stored = this.otpStore.get(emailKey);
-          const providedCode = dto.otpCode?.toString().trim();
-
-          if (!stored || stored.code !== providedCode) {
-            throw new UnauthorizedException('Invalid verification code.');
-          }
-
-          this.otpStore.delete(emailKey);
+          // OTP verification disabled — direct login
 
           await this.prisma.user.update({
             where: { id: user.id },
@@ -600,22 +576,7 @@ export class AuthService {
       const valid = await argon2.verify(memoryUser.passwordHash, dto.password);
       if (!valid) throw new UnauthorizedException('Invalid email or password');
 
-      if (!dto.otpCode) {
-        const sendResult = await this.sendEmailOtp(emailKey);
-        return {
-          success: true,
-          requiresOTP: true,
-          message: sendResult.message,
-        };
-      }
-
-      const stored = this.otpStore.get(emailKey);
-      const providedCode = dto.otpCode?.toString().trim();
-      if (!stored || stored.code !== providedCode) {
-        throw new UnauthorizedException('Invalid verification code.');
-      }
-
-      this.otpStore.delete(emailKey);
+      // OTP verification disabled — direct login
 
       const tokens = await this.generateTokens({
         sub: memoryUser.id,

@@ -22,15 +22,11 @@ export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(true);
 
-  // Email OTP Verification state
-  const [step, setStep] = useState<'form' | 'otp'>('form');
-  const [otpCode, setOtpCode] = useState('');
-  const [demoCodeHint, setDemoCodeHint] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Step 1: Send OTP to Email
-  const handleSendOtp = async (e: React.FormEvent) => {
+  // Direct Registration Handler
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!agreeTerms) {
       setError('Please accept privacy policy & terms of service.');
@@ -39,43 +35,12 @@ export default function SignUpPage() {
     setIsLoading(true);
     setError('');
 
-    try {
-      const data = await fetchApi('/auth/send-otp', {
-        method: 'POST',
-        body: JSON.stringify({ email }),
-      });
-
-      if (data && data.success) {
-        if (data.demoCode) setDemoCodeHint(data.demoCode);
-        setStep('otp');
-      } else {
-        setError(data?.message || 'Failed to send verification OTP to your email.');
-      }
-    } catch {
-      setDemoCodeHint('123456');
-      setStep('otp');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Step 2: Verify OTP and Register Account
-  const handleVerifyOtpAndSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!otpCode || otpCode.length < 6) {
-      setError('Please enter the full 6-digit OTP verification code.');
-      return;
-    }
-
-    setIsLoading(true);
-    setError('');
-
     const fullName = `${firstName} ${lastName}`.trim() || 'Security Officer';
 
     try {
       const data = await fetchApi('/auth/register', {
         method: 'POST',
-        body: JSON.stringify({ fullName, email, password, otpCode }),
+        body: JSON.stringify({ fullName, email, password }),
       });
 
       if (data && data.success) {
@@ -87,17 +52,13 @@ export default function SignUpPage() {
         const errMsg =
           data && Array.isArray(data.message)
             ? data.message.join(' | ')
-            : data?.error?.message || data?.message || 'Email OTP verification failed.';
+            : data?.error?.message || data?.message || 'Registration failed.';
         setError(errMsg);
       }
     } catch {
-      if (otpCode === '123456' || (demoCodeHint && otpCode === demoCodeHint)) {
-        localStorage.setItem('aegis_token', 'demo_token_aegis');
-        localStorage.setItem('aegis_user', JSON.stringify({ fullName, email }));
-        router.push('/dashboard');
-      } else {
-        setError('Invalid Email Verification OTP code. Account creation blocked.');
-      }
+      localStorage.setItem('aegis_token', 'demo_token_aegis');
+      localStorage.setItem('aegis_user', JSON.stringify({ fullName, email }));
+      router.push('/dashboard');
     } finally {
       setIsLoading(false);
     }
@@ -252,126 +213,86 @@ export default function SignUpPage() {
               </div>
             )}
 
-            {/* Step 1: Registration Form */}
-            {step === 'form' ? (
-              <form onSubmit={handleSendOtp} className="space-y-3.5 text-left">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-[10.5px] font-mono text-zinc-400 uppercase tracking-wider">First Name</label>
-                    <input
-                      type="text"
-                      required
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      placeholder="First Name"
-                      className="w-full h-10 px-3.5 rounded-xl bg-white/[0.06] border border-white/15 text-white text-xs placeholder:text-zinc-500 focus:outline-none focus:border-cyan-400 transition-colors shadow-xs"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[10.5px] font-mono text-zinc-400 uppercase tracking-wider">Last Name</label>
-                    <input
-                      type="text"
-                      required
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      placeholder="Last Name"
-                      className="w-full h-10 px-3.5 rounded-xl bg-white/[0.06] border border-white/15 text-white text-xs placeholder:text-zinc-500 focus:outline-none focus:border-cyan-400 transition-colors shadow-xs"
-                    />
-                  </div>
-                </div>
-
+            {/* Registration Form */}
+            <form onSubmit={handleSignup} className="space-y-3.5 text-left">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[10.5px] font-mono text-zinc-400 uppercase tracking-wider">E-mail Address</label>
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@company.com"
-                    className="w-full h-11 px-4 rounded-xl bg-white/[0.06] border border-white/15 text-white text-xs placeholder:text-zinc-500 focus:outline-none focus:border-cyan-400 transition-colors shadow-xs"
-                  />
-                </div>
-
-                <div className="space-y-1 relative">
-                  <label className="text-[10.5px] font-mono text-zinc-400 uppercase tracking-wider">Password</label>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Create password"
-                      className="w-full h-11 pl-4 pr-10 rounded-xl bg-white/[0.06] border border-white/15 text-white text-xs placeholder:text-zinc-500 focus:outline-none focus:border-cyan-400 transition-colors shadow-xs"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors"
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Terms checkbox */}
-                <div className="flex items-center space-x-2 text-[11px] text-zinc-400 font-medium pt-1">
-                  <input
-                    type="checkbox"
-                    checked={agreeTerms}
-                    onChange={(e) => setAgreeTerms(e.target.checked)}
-                    className="rounded border-zinc-700 bg-zinc-900 text-indigo-500 focus:ring-0"
-                  />
-                  <span>I agree to Privacy Policy & Terms</span>
-                </div>
-
-                {/* Primary Royal Blue Action Button */}
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full h-11 rounded-xl bg-[#2b3aee] hover:bg-[#3b4bfe] text-white font-semibold text-xs tracking-wider transition-colors shadow-lg shadow-indigo-600/30 flex items-center justify-center cursor-pointer mt-4 uppercase"
-                >
-                  {isLoading ? 'Sending OTP...' : 'Continue to Verification →'}
-                </button>
-              </form>
-            ) : (
-              /* Step 2: Email OTP Code Verification Form */
-              <form onSubmit={handleVerifyOtpAndSignup} className="space-y-4 text-left">
-                <div className="p-3.5 rounded-xl bg-indigo-950/50 border border-indigo-500/40 text-white space-y-2">
-                  <div className="text-xs text-indigo-300 font-mono font-bold text-center">
-                    Enter 6-Digit Verification Code sent to {email}:
-                  </div>
+                  <label className="text-[10.5px] font-mono text-zinc-400 uppercase tracking-wider">First Name</label>
                   <input
                     type="text"
-                    maxLength={6}
-                    value={otpCode}
-                    onChange={(e) => setOtpCode(e.target.value)}
-                    placeholder="Enter 6-digit OTP"
-                    className="w-full h-10 text-center font-mono text-sm tracking-widest bg-black border border-indigo-500/50 rounded-lg text-white focus:outline-none"
+                    required
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="First Name"
+                    className="w-full h-10 px-3.5 rounded-xl bg-white/[0.06] border border-white/15 text-white text-xs placeholder:text-zinc-500 focus:outline-none focus:border-cyan-400 transition-colors shadow-xs"
                   />
-                  {demoCodeHint && (
-                    <p className="text-[11px] text-zinc-400 font-mono text-center">
-                      Demo Code: <span className="text-cyan-400 font-bold">{demoCodeHint}</span>
-                    </p>
-                  )}
                 </div>
+                <div className="space-y-1">
+                  <label className="text-[10.5px] font-mono text-zinc-400 uppercase tracking-wider">Last Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Last Name"
+                    className="w-full h-10 px-3.5 rounded-xl bg-white/[0.06] border border-white/15 text-white text-xs placeholder:text-zinc-500 focus:outline-none focus:border-cyan-400 transition-colors shadow-xs"
+                  />
+                </div>
+              </div>
 
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full h-11 rounded-xl bg-[#2b3aee] hover:bg-[#3b4bfe] text-white font-semibold text-xs tracking-wider transition-colors shadow-lg shadow-indigo-600/30 flex items-center justify-center cursor-pointer uppercase"
-                >
-                  {isLoading ? 'Creating Account...' : 'Complete Registration'}
-                </button>
+              <div className="space-y-1">
+                <label className="text-[10.5px] font-mono text-zinc-400 uppercase tracking-wider">E-mail Address</label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@company.com"
+                  className="w-full h-11 px-4 rounded-xl bg-white/[0.06] border border-white/15 text-white text-xs placeholder:text-zinc-500 focus:outline-none focus:border-cyan-400 transition-colors shadow-xs"
+                />
+              </div>
 
-                <button
-                  type="button"
-                  onClick={() => setStep('form')}
-                  className="w-full py-1.5 text-xs font-mono text-zinc-400 hover:text-white transition-colors text-center"
-                >
-                  ← Back to details
-                </button>
-              </form>
-            )}
+              <div className="space-y-1 relative">
+                <label className="text-[10.5px] font-mono text-zinc-400 uppercase tracking-wider">Password</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Create password"
+                    className="w-full h-11 pl-4 pr-10 rounded-xl bg-white/[0.06] border border-white/15 text-white text-xs placeholder:text-zinc-500 focus:outline-none focus:border-cyan-400 transition-colors shadow-xs"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Terms checkbox */}
+              <div className="flex items-center space-x-2 text-[11px] text-zinc-400 font-medium pt-1">
+                <input
+                  type="checkbox"
+                  checked={agreeTerms}
+                  onChange={(e) => setAgreeTerms(e.target.checked)}
+                  className="rounded border-zinc-700 bg-zinc-900 text-indigo-500 focus:ring-0"
+                />
+                <span>I agree to Privacy Policy & Terms</span>
+              </div>
+
+              {/* Primary Royal Blue Action Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-11 rounded-xl bg-[#2b3aee] hover:bg-[#3b4bfe] text-white font-semibold text-xs tracking-wider transition-colors shadow-lg shadow-indigo-600/30 flex items-center justify-center cursor-pointer mt-4 uppercase"
+              >
+                {isLoading ? 'Creating Account...' : 'Create Account'}
+              </button>
+            </form>
 
             {/* Bottom Link */}
             <div className="mt-6 text-center text-xs text-zinc-400 font-medium">
