@@ -70,3 +70,4 @@ ai-risk-engine/
 # Internal PDFs & Documentation
 *.pdf
 Aegis_AI_Project_Summary.pdf
+/public/
