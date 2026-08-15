@@ -8,7 +8,11 @@ export interface ApiResponseError {
   details?: Record<string, any>;
 }
 
-export async function fetchApi<T = any>(endpoint: string, options: RequestInit = {}): Promise<T | ApiResponseError | null> {
+export type ApiFetchOptions = RequestInit & {
+  timeout?: number;
+};
+
+export async function fetchApi<T = any>(endpoint: string, options: ApiFetchOptions = {}): Promise<T | ApiResponseError | null> {
   try {
     const token = typeof window !== 'undefined' ? localStorage.getItem('aegis_token') : null;
     const headers: Record<string, string> = {
@@ -30,20 +34,28 @@ export async function fetchApi<T = any>(endpoint: string, options: RequestInit =
 
     const url = `${API_BASE_URL}${fullEndpoint}`;
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), (options as any)?.timeout || 6000);
+
     let res: Response;
     try {
       res = await fetch(url, {
         ...options,
         headers,
+        signal: options.signal || controller.signal,
       });
     } catch (fetchErr: any) {
-      console.warn(`[Network Error] Failed to fetch ${url}: ${fetchErr.message}`);
+      clearTimeout(timeoutId);
+      const isTimeout = fetchErr.name === 'AbortError';
+      console.warn(`[Network ${isTimeout ? 'Timeout' : 'Error'}] Failed to fetch ${url}: ${fetchErr.message}`);
       return {
         error: true,
-        status: 0,
-        code: 'NETWORK_ERROR',
-        message: 'Backend server unreachable',
+        status: isTimeout ? 408 : 0,
+        code: isTimeout ? 'REQUEST_TIMEOUT' : 'NETWORK_ERROR',
+        message: isTimeout ? 'Server response timed out. Waking up instance...' : 'Backend server unreachable',
       } as any;
+    } finally {
+      clearTimeout(timeoutId);
     }
 
     if (!res.ok) {

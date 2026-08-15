@@ -78,7 +78,7 @@ export function ConnectWebsiteModal({ isOpen, onClose, onSuccess }: ConnectWebsi
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <label className="text-xs font-bold text-zinc-700 block font-mono">
               Target Website URL Link:
             </label>
@@ -93,6 +93,29 @@ export function ConnectWebsiteModal({ isOpen, onClose, onSuccess }: ConnectWebsi
                 autoFocus
               />
             </div>
+
+            {/* Quick 1-Click Domain Suggestion Chips */}
+            <div className="space-y-1 pt-1">
+              <span className="text-[10px] font-mono text-zinc-400">Quick Test Websites:</span>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  'https://my-app.vercel.app',
+                  'https://demo-saas.io',
+                  'http://localhost:3000',
+                  'https://stripe.com',
+                ].map((chip) => (
+                  <button
+                    key={chip}
+                    type="button"
+                    onClick={() => setTargetUrl(chip)}
+                    className="px-2 py-0.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-[10px] font-mono text-zinc-700 transition-colors cursor-pointer"
+                  >
+                    {chip}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <p className="text-[11px] text-zinc-400 font-mono">
               Supports any live HTTP/HTTPS domain, Vercel app, or local dev endpoint.
             </p>
@@ -105,18 +128,18 @@ export function ConnectWebsiteModal({ isOpen, onClose, onSuccess }: ConnectWebsi
             </div>
           )}
 
-          <div className="flex items-center justify-end space-x-3 pt-2">
+          <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-2 sm:gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-mono text-xs font-semibold transition-colors cursor-pointer"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-mono text-xs font-semibold transition-colors cursor-pointer text-center"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isScanning || !targetUrl.trim()}
-              className="px-5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white font-mono text-xs font-bold transition-all shadow-md cursor-pointer flex items-center space-x-2 disabled:opacity-50"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white font-mono text-xs font-bold transition-all shadow-md cursor-pointer flex items-center justify-center space-x-2 disabled:opacity-50"
             >
               {isScanning ? (
                 <>

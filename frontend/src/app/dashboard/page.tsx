@@ -277,6 +277,7 @@ export default function DashboardPage() {
   return (
     <div className="h-screen w-screen flex bg-zinc-50 text-zinc-900 font-sans overflow-hidden">
       {/* ═══ UPGRADED COLLAPSIBLE & MOBILE SIDEBAR ═══ */}
+      {/* ═══ UPGRADED COLLAPSIBLE & MOBILE SIDEBAR ═══ */}
       <Sidebar
         activeTab={activeNav}
         setActiveTab={setActiveNav}
@@ -284,6 +285,7 @@ export default function DashboardPage() {
         isMobileOpen={isMobileMenuOpen}
         onCloseMobile={() => setIsMobileMenuOpen(false)}
         currentUser={currentUser}
+        onOpenConnectSite={() => setIsConnectModalOpen(true)}
       />
 
       {/* ═══ MAIN OPEN DATA COMMAND AREA ═══ */}
@@ -311,7 +313,17 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
-            {/* Run Baseline Calibration Button */}
+            {/* Mobile-First "Add Site" / "Connect" Button */}
+            <button
+              onClick={() => setIsConnectModalOpen(true)}
+              className="sm:hidden flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-900 text-xs font-mono font-bold transition-all cursor-pointer shadow-xs"
+              title="Connect or Add Target Website URL"
+            >
+              <Sparkles className="w-3 h-3 text-emerald-400" />
+              <span>{isConnected ? '➕ Site' : '⚡ Connect'}</span>
+            </button>
+
+            {/* Run Baseline Calibration Button (Desktop) */}
             <button
               onClick={() => setIsCalibrationModalOpen(true)}
               className="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-700 text-xs font-mono font-semibold transition-all cursor-pointer shadow-xs"
@@ -320,7 +332,7 @@ export default function DashboardPage() {
               <span>{hasBaseline ? 'Recalibrate Baseline' : 'Run 60s Calibration'}</span>
             </button>
 
-            {/* Target Website Badge & Add/Switch Site Button */}
+            {/* Target Website Badge & Add/Switch Site Button (Desktop) */}
             <div className="hidden sm:flex items-center space-x-1.5">
               <button
                 onClick={() => setIsConnectModalOpen(true)}
@@ -400,9 +412,9 @@ export default function DashboardPage() {
         <main className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-6 min-h-0 scroll-smooth scrollbar-none">
           {activeNav === 'dashboard' && (
             <>
-              {/* ══ TARGET WEBSITE CONNECTION STATUS BANNER ══ */}
+              {/* ══ TARGET WEBSITE CONNECTION STATUS BANNER (RESPONSIVE WITH DIRECT ACTION CTA) ══ */}
               {!isConnected ? (
-                <div className="p-5 rounded-2xl border border-amber-200 bg-amber-50/80 flex items-center justify-between shadow-xs">
+                <div className="p-4 sm:p-5 rounded-2xl border border-amber-200 bg-amber-50/90 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
                   <div className="space-y-1">
                     <div className="flex items-center space-x-2">
                       <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-xs font-mono font-bold border border-amber-200">
@@ -411,9 +423,16 @@ export default function DashboardPage() {
                       <h3 className="text-sm font-bold text-amber-950">No Target Website Connected</h3>
                     </div>
                     <p className="text-xs text-amber-800">
-                      Please select <strong className="text-amber-950">"Connect Website"</strong> from the sidebar menu to enter your website URL link and start AEGIS monitoring.
+                      Enter your website URL to activate AEGIS zero-trust biometrics telemetry and 15-module posture audits.
                     </p>
                   </div>
+                  <button
+                    onClick={() => setIsConnectModalOpen(true)}
+                    className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-mono font-bold transition-all shadow-md cursor-pointer flex items-center justify-center space-x-2 shrink-0 hover:scale-105 active:scale-95"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>⚡ Connect Website (Add Site)</span>
+                  </button>
                 </div>
               ) : (
                 <>
@@ -427,13 +446,20 @@ export default function DashboardPage() {
                         <div className="text-[11px] text-emerald-700 font-mono truncate max-w-md">{connectedSite?.url}</div>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-3">
-                      <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200">
+                    <div className="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                      <span className="hidden sm:inline-block text-xs font-mono font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200">
                         AEGIS Sentinel: Active 🛡️
                       </span>
                       <button
+                        onClick={() => setIsConnectModalOpen(true)}
+                        className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-xs text-white font-mono font-semibold transition-colors cursor-pointer shadow-xs flex items-center space-x-1"
+                        title="Connect another target website URL"
+                      >
+                        <span>➕ Add / Switch Site</span>
+                      </button>
+                      <button
                         onClick={() => setActiveNav('integrations')}
-                        className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-xs text-white font-mono transition-colors cursor-pointer shadow-xs"
+                        className="px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-mono font-semibold border border-zinc-300 transition-colors cursor-pointer"
                       >
                         Manage Target
                       </button>

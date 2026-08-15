@@ -55,6 +55,7 @@ interface SidebarProps {
   isMobileOpen?: boolean;
   onCloseMobile?: () => void;
   currentUser?: { fullName?: string; email?: string; role?: string } | null;
+  onOpenConnectSite?: () => void;
 }
 
 import { useConnectedWebsite } from '@/lib/aegis-website';
@@ -67,6 +68,7 @@ export function Sidebar({
   isMobileOpen = false,
   onCloseMobile,
   currentUser,
+  onOpenConnectSite,
 }: SidebarProps) {
   const router = useRouter();
   const { connectedSite, isConnected } = useConnectedWebsite();
@@ -240,8 +242,60 @@ export function Sidebar({
           )}
         </div>
 
+        {/* ══ TARGET WEBSITE CONNECTOR QUICK ACTION ══ */}
+        <div className="mt-3 px-1">
+          {!collapsed ? (
+            <div
+              onClick={() => {
+                if (onOpenConnectSite) {
+                  onOpenConnectSite();
+                } else {
+                  handleItemClick('integrations');
+                }
+                if (isMobile && onCloseMobile) onCloseMobile();
+              }}
+              className={`p-2.5 rounded-xl border text-xs cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-between ${
+                isConnected
+                  ? 'bg-emerald-50/90 border-emerald-200 hover:bg-emerald-100/90 text-emerald-900'
+                  : 'bg-gradient-to-r from-amber-500 to-amber-600 text-white border-amber-600 shadow-sm'
+              }`}
+              title="Click to Connect or Switch Target Website"
+            >
+              <div className="flex items-center space-x-2 min-w-0">
+                <Globe className={`w-4 h-4 shrink-0 ${isConnected ? 'text-emerald-600' : 'text-white animate-pulse'}`} />
+                <div className="truncate">
+                  <div className="font-bold text-[11px] truncate">
+                    {isConnected ? connectedSite?.domain : '⚡ Connect Target Site'}
+                  </div>
+                  <div className={`text-[9px] font-mono truncate ${isConnected ? 'text-emerald-700' : 'text-amber-100'}`}>
+                    {isConnected ? '🟢 Active Monitoring' : 'Tap to Add Site URL ➕'}
+                  </div>
+                </div>
+              </div>
+              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md shrink-0 ml-1 ${
+                isConnected ? 'bg-emerald-200/70 text-emerald-800' : 'bg-white/20 text-white'
+              }`}>
+                {isConnected ? 'Change' : 'Add'}
+              </span>
+            </div>
+          ) : (
+            <div
+              onClick={() => {
+                if (onOpenConnectSite) onOpenConnectSite();
+                else handleItemClick('integrations');
+              }}
+              className={`w-10 h-10 mx-auto rounded-xl flex items-center justify-center cursor-pointer transition-transform hover:scale-105 border ${
+                isConnected ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-amber-500 border-amber-600 text-white animate-pulse'
+              }`}
+              title={isConnected ? `Target: ${connectedSite?.domain}` : 'Connect Target Website'}
+            >
+              <Globe className="w-5 h-5" />
+            </div>
+          )}
+        </div>
+
         {/* ══ NAVIGATION CATEGORIES ══ */}
-        <div className="mt-3 space-y-4 overflow-y-auto max-h-[calc(100vh-210px)] scrollbar-none pr-0.5">
+        <div className="mt-3 space-y-4 overflow-y-auto max-h-[calc(100vh-250px)] scrollbar-none pr-0.5">
           {navCategories.map((cat, idx) => (
             <div key={idx} className="space-y-1">
               {!collapsed && (
