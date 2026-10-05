@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { RiskAssessmentResult, RiskLevel, AdaptiveMfaState } from '@aegis/shared';
+import { RiskAssessmentResult, RiskLevel, AdaptiveMfaState, ComputedBiometricFeatures } from '@aegis/shared';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Aegis AI — Risk Engine Service
@@ -57,8 +57,8 @@ export class RiskEngineService {
   async evaluateRisk(payload: {
     sessionId: string;
     userId: string;
-    currentFeatures: Record<string, number>;
-    baselineFeatures?: Record<string, number>;
+    currentFeatures: Record<string, number> | ComputedBiometricFeatures;
+    baselineFeatures?: Record<string, number> | Partial<ComputedBiometricFeatures>;
     deviceTrusted?: boolean;
     isSimulated?: boolean;
     simulationType?: string;
@@ -98,14 +98,14 @@ export class RiskEngineService {
   private fallbackEvaluateRisk(payload: {
     sessionId: string;
     userId: string;
-    currentFeatures: Record<string, number>;
-    baselineFeatures?: Record<string, number>;
+    currentFeatures: Record<string, number> | ComputedBiometricFeatures;
+    baselineFeatures?: Record<string, number> | Partial<ComputedBiometricFeatures>;
     deviceTrusted?: boolean;
     isSimulated?: boolean;
     simulationType?: string;
   }): RiskAssessmentResult {
-    const feat = payload.currentFeatures || {};
-    const base = payload.baselineFeatures || {};
+    const feat = (payload.currentFeatures || {}) as Record<string, number>;
+    const base = (payload.baselineFeatures || {}) as Record<string, number>;
     const isSimulated = payload.isSimulated ?? false;
 
     // ── Component 1: Keystroke Z-Score (w = 0.30) ─────────────────────────
@@ -147,22 +147,18 @@ export class RiskEngineService {
     // ── Component 5: Device Trust Penalty (w = 0.10) ─────────────────────
     const deviceComponent = payload.deviceTrusted === false ? 0.9 : 0.0;
 
-    // ── Simulated scenario overrides (for Intruder Simulator) ────────────
-    let overallScore: number;
-    if (isSimulated) {
-      overallScore = payload.simulationType === 'BOT_ATTACK' ? 0.91 :
-                     payload.simulationType === 'CREDENTIAL_STUFFING' ? 0.88 :
-                     payload.simulationType === 'ACCOUNT_TAKEOVER' ? 0.82 : 0.75;
-    } else {
-      overallScore =
+    // ── Multi-factor weighted formula computation ─────────────────────────
+    const overallScore = Math.min(
+      Math.max(
         0.30 * keystrokeComponent +
         0.30 * mouseComponent +
         0.20 * velocityComponent +
         0.10 * consistencyComponent +
-        0.10 * deviceComponent;
-
-      overallScore = Math.min(Math.max(overallScore, 0.04), 0.99);
-    }
+        0.10 * deviceComponent,
+        0.04,
+      ),
+      0.99,
+    );
 
     // ── Risk level classification ─────────────────────────────────────────
     const riskLevel: RiskLevel =
@@ -213,6 +209,26 @@ export class RiskEngineService {
           ? `Flight time CV ${flightCV.toFixed(3)} — highly erratic inter-key intervals (unusual access pattern).`
           : `Inter-key interval consistency CV ${flightCV.toFixed(3)} within expected human range (0.05 – 0.80).`,
       },
+      ...(feat.interKeystrokeJitter !== undefined ? [{
+        feature: 'Inter-Keystroke Timing Jitter',
+        impact: (feat.interKeystrokeJitter < 2.0 ? 'CRITICAL_ANOMALY' : Math.abs(feat.interKeystrokeJitter - (base.interKeystrokeJitter ?? 30.0)) > 25 ? 'HIGH_ANOMALY' : 'NORMAL') as ExplainableFactor['impact'],
+        score: feat.interKeystrokeJitter < 2.0 ? 0.25 : 0.02,
+        rawValue: Math.round(feat.interKeystrokeJitter * 10) / 10,
+        baselineValue: Math.round((base.interKeystrokeJitter ?? 30.0) * 10) / 10,
+        description: feat.interKeystrokeJitter < 2.0
+          ? `Micro-jitter ${feat.interKeystrokeJitter.toFixed(1)}ms indicates synthetic automated replay (human expected ≥ 15ms).`
+          : `Keystroke jitter ${feat.interKeystrokeJitter.toFixed(1)}ms within natural human cadence variance.`,
+      }] : []),
+      ...(feat.mouseAccelerationStd !== undefined ? [{
+        feature: 'Mouse Acceleration Profile',
+        impact: (feat.mouseAccelerationStd < 25.0 ? 'CRITICAL_ANOMALY' : 'NORMAL') as ExplainableFactor['impact'],
+        score: feat.mouseAccelerationStd < 25.0 ? 0.20 : 0.02,
+        rawValue: Math.round(feat.mouseAccelerationStd),
+        baselineValue: Math.round(base.mouseAccelerationStd ?? 1200.0),
+        description: feat.mouseAccelerationStd < 25.0
+          ? `Mouse acceleration std ${feat.mouseAccelerationStd.toFixed(0)}px/s² demonstrates unnatural uniform synthetic velocity.`
+          : `Mouse acceleration variance ${feat.mouseAccelerationStd.toFixed(0)}px/s² matches natural neuromuscular motor control.`,
+      }] : []),
       {
         feature: 'Device Trust Status',
         impact: payload.deviceTrusted === false ? 'UNRECOGNIZED' : 'MATCH',

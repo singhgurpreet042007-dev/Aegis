@@ -4,7 +4,7 @@ import { RiskEngineService } from '../risk/risk-engine.service';
 import { EventsGateway } from '../websockets/events.gateway';
 import { SentinelService } from '../sentinel/sentinel.service';
 import { AuditLogService } from '../audit/audit-log.service';
-import { BiometricTelemetryPayload, RiskLevel, AlertSeverity, AlertStatus, AdaptiveMfaState } from '@aegis/shared';
+import { BiometricTelemetryPayload, ComputedBiometricFeatures, RiskLevel, AlertSeverity, AlertStatus, AdaptiveMfaState } from '@aegis/shared';
 
 @Injectable()
 export class BiometricsService {
@@ -46,10 +46,25 @@ export class BiometricsService {
             keystrokeDwellStd: baseline.keystrokeDwellStd,
             keystrokeFlightMean: baseline.keystrokeFlightMean,
             keystrokeFlightStd: baseline.keystrokeFlightStd,
+            keystrokeFlightCV: baseline.keystrokeFlightCV ?? 0.25,
+            interKeystrokeJitter: baseline.interKeystrokeJitter ?? 30.0,
+            backspaceRate: baseline.backspaceRate ?? 0.05,
+            pauseBeforeFirstKeystroke: baseline.pauseBeforeFirstKeystroke ?? 350.0,
+            typingSpeedCPM: baseline.typingSpeedCPM ?? 240.0,
+            dwellToFlightRatio: baseline.dwellToFlightRatio ?? 0.78,
             mouseVelocityMean: baseline.mouseVelocityMean,
             mouseVelocityStd: baseline.mouseVelocityStd,
+            mouseAccelerationMean: baseline.mouseAccelerationMean ?? 2500.0,
+            mouseAccelerationStd: baseline.mouseAccelerationStd ?? 1200.0,
             mouseJerkMean: baseline.mouseJerkMean,
+            mouseJerkStd: baseline.mouseJerkStd ?? 30.0,
             mouseCurvatureMean: baseline.mouseCurvatureMean,
+            mouseStraightnessIndex: baseline.mouseStraightnessIndex ?? 0.40,
+            mouseAngleChangeRate: baseline.mouseAngleChangeRate ?? 2.8,
+            mousePauseRatio: baseline.mousePauseRatio ?? 0.18,
+            clickToClickDurationMean: baseline.clickToClickDurationMean ?? 650.0,
+            clickToClickDurationStd: baseline.clickToClickDurationStd ?? 180.0,
+            mousePathEfficiency: baseline.mousePathEfficiency ?? 0.65,
           };
         }
       } catch (err) {
@@ -97,10 +112,25 @@ export class BiometricsService {
         keystrokeDwellStd: 25.0,
         keystrokeFlightMean: 140.0,
         keystrokeFlightStd: 35.0,
+        keystrokeFlightCV: 0.25,
+        interKeystrokeJitter: 30.0,
+        backspaceRate: 0.05,
+        pauseBeforeFirstKeystroke: 350.0,
+        typingSpeedCPM: 240.0,
+        dwellToFlightRatio: 0.78,
         mouseVelocityMean: 850.0,
         mouseVelocityStd: 200.0,
+        mouseAccelerationMean: 2500.0,
+        mouseAccelerationStd: 1200.0,
         mouseJerkMean: 45.0,
+        mouseJerkStd: 30.0,
         mouseCurvatureMean: 0.38,
+        mouseStraightnessIndex: 0.40,
+        mouseAngleChangeRate: 2.8,
+        mousePauseRatio: 0.18,
+        clickToClickDurationMean: 650.0,
+        clickToClickDurationStd: 180.0,
+        mousePathEfficiency: 0.65,
       },
       deviceTrusted: true,
       isSimulated,
@@ -227,10 +257,25 @@ export class BiometricsService {
       keystrokeDwellStd: features.keystrokeDwellStd,
       keystrokeFlightMean: features.keystrokeFlightMean,
       keystrokeFlightStd: features.keystrokeFlightStd,
+      keystrokeFlightCV: features.keystrokeFlightCV,
+      interKeystrokeJitter: features.interKeystrokeJitter,
+      backspaceRate: features.backspaceRate,
+      pauseBeforeFirstKeystroke: features.pauseBeforeFirstKeystroke,
+      typingSpeedCPM: features.typingSpeedCPM,
+      dwellToFlightRatio: features.dwellToFlightRatio,
       mouseVelocityMean: features.mouseVelocityMean,
       mouseVelocityStd: features.mouseVelocityStd,
+      mouseAccelerationMean: features.mouseAccelerationMean,
+      mouseAccelerationStd: features.mouseAccelerationStd,
       mouseJerkMean: features.mouseJerkMean,
+      mouseJerkStd: features.mouseJerkStd,
       mouseCurvatureMean: features.mouseCurvatureMean,
+      mouseStraightnessIndex: features.mouseStraightnessIndex,
+      mouseAngleChangeRate: features.mouseAngleChangeRate,
+      mousePauseRatio: features.mousePauseRatio,
+      clickToClickDurationMean: features.clickToClickDurationMean,
+      clickToClickDurationStd: features.clickToClickDurationStd,
+      mousePathEfficiency: features.mousePathEfficiency,
       sampleCount: features.sampleCount,
     };
 
@@ -300,10 +345,25 @@ export class BiometricsService {
           keystrokeDwellStd: features.keystrokeDwellStd || 22.0,
           keystrokeFlightMean: features.keystrokeFlightMean || 135.0,
           keystrokeFlightStd: features.keystrokeFlightStd || 30.0,
+          keystrokeFlightCV: features.keystrokeFlightCV || 0.25,
+          interKeystrokeJitter: features.interKeystrokeJitter || 28.0,
+          backspaceRate: features.backspaceRate || 0.05,
+          pauseBeforeFirstKeystroke: features.pauseBeforeFirstKeystroke || 320.0,
+          typingSpeedCPM: features.typingSpeedCPM || 245.0,
+          dwellToFlightRatio: features.dwellToFlightRatio || 0.83,
           mouseVelocityMean: features.mouseVelocityMean || 820.0,
           mouseVelocityStd: features.mouseVelocityStd || 180.0,
+          mouseAccelerationMean: features.mouseAccelerationMean || 2450.0,
+          mouseAccelerationStd: features.mouseAccelerationStd || 1150.0,
           mouseJerkMean: features.mouseJerkMean || 40.0,
+          mouseJerkStd: features.mouseJerkStd || 28.0,
           mouseCurvatureMean: features.mouseCurvatureMean || 0.38,
+          mouseStraightnessIndex: features.mouseStraightnessIndex || 0.40,
+          mouseAngleChangeRate: features.mouseAngleChangeRate || 2.7,
+          mousePauseRatio: features.mousePauseRatio || 0.17,
+          clickToClickDurationMean: features.clickToClickDurationMean || 620.0,
+          clickToClickDurationStd: features.clickToClickDurationStd || 170.0,
+          mousePathEfficiency: features.mousePathEfficiency || 0.67,
           sampleCount: Math.max(features.sampleCount, 50),
         };
 
@@ -328,10 +388,25 @@ export class BiometricsService {
       keystrokeDwellStd: features.keystrokeDwellStd || 22.0,
       keystrokeFlightMean: features.keystrokeFlightMean || 135.0,
       keystrokeFlightStd: features.keystrokeFlightStd || 30.0,
+      keystrokeFlightCV: features.keystrokeFlightCV || 0.25,
+      interKeystrokeJitter: features.interKeystrokeJitter || 28.0,
+      backspaceRate: features.backspaceRate || 0.05,
+      pauseBeforeFirstKeystroke: features.pauseBeforeFirstKeystroke || 320.0,
+      typingSpeedCPM: features.typingSpeedCPM || 245.0,
+      dwellToFlightRatio: features.dwellToFlightRatio || 0.83,
       mouseVelocityMean: features.mouseVelocityMean || 820.0,
       mouseVelocityStd: features.mouseVelocityStd || 180.0,
+      mouseAccelerationMean: features.mouseAccelerationMean || 2450.0,
+      mouseAccelerationStd: features.mouseAccelerationStd || 1150.0,
       mouseJerkMean: features.mouseJerkMean || 40.0,
+      mouseJerkStd: features.mouseJerkStd || 28.0,
       mouseCurvatureMean: features.mouseCurvatureMean || 0.38,
+      mouseStraightnessIndex: features.mouseStraightnessIndex || 0.40,
+      mouseAngleChangeRate: features.mouseAngleChangeRate || 2.7,
+      mousePauseRatio: features.mousePauseRatio || 0.17,
+      clickToClickDurationMean: features.clickToClickDurationMean || 620.0,
+      clickToClickDurationStd: features.clickToClickDurationStd || 170.0,
+      mousePathEfficiency: features.mousePathEfficiency || 0.67,
       sampleCount: Math.max(features.sampleCount, 50),
     };
 
@@ -408,66 +483,207 @@ export class BiometricsService {
     this.inMemorySessions.set(sessionId, existing);
   }
 
-  private extractFeatures(keystrokes: any[], mousePoints: any[]) {
+  private extractFeatures(keystrokes: any[] = [], mousePoints: any[] = []): ComputedBiometricFeatures {
+    const calcMean = (arr: number[], fallback: number) =>
+      arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : fallback;
+
+    const calcStd = (arr: number[], mean: number, fallback: number) =>
+      arr.length
+        ? Math.sqrt(arr.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / arr.length)
+        : fallback;
+
+    // --- 1. Keystroke Dwell Times ---
     const dwells = keystrokes.map((k) => k.dwellTime || 110).filter((d) => d > 0);
+    const dwellMean = calcMean(dwells, 110.0);
+    const dwellStd = calcStd(dwells, dwellMean, 25.0);
+
+    // --- 2. Keystroke Flight Times ---
     const flights = keystrokes.map((k) => k.flightTime || 140).filter((f) => f > 0);
+    const flightMean = calcMean(flights, 140.0);
+    const flightStd = calcStd(flights, flightMean, 35.0);
 
-    const calcMean = (arr: number[]) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 110);
-    const calcStd = (arr: number[], mean: number) =>
-      arr.length ? Math.sqrt(arr.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / arr.length) : 25;
+    // --- 3. Keystroke Flight CV (Coefficient of Variation) ---
+    const flightCV = flightMean > 0 ? flightStd / flightMean : 0.25;
 
-    const dwellMean = calcMean(dwells);
-    const dwellStd = calcStd(dwells, dwellMean);
-    const flightMean = calcMean(flights);
-    const flightStd = calcStd(flights, flightMean);
-
-    let straightness = 0.40;
-    let computedVelocities: number[] = [];
-    let computedJerks: number[] = [];
-
-    if (mousePoints.length >= 2) {
-      let totalLen = 0;
-      for (let i = 1; i < mousePoints.length; i++) {
-        const dist = Math.hypot(mousePoints[i].x - mousePoints[i - 1].x, mousePoints[i].y - mousePoints[i - 1].y);
-        totalLen += dist;
-
-        if (mousePoints[i].t && mousePoints[i - 1].t) {
-          const dt = (mousePoints[i].t - mousePoints[i - 1].t) / 1000;
-          if (dt > 0) {
-            const vel = dist / dt;
-            computedVelocities.push(vel);
-          }
-        }
+    // --- 4. Inter-Keystroke Timing Jitter (variance beyond CV) ---
+    const flightJitters: number[] = [];
+    if (flights.length >= 2) {
+      for (let i = 1; i < flights.length; i++) {
+        flightJitters.push(Math.abs(flights[i] - flights[i - 1]));
       }
+    }
+    const interKeystrokeJitter = calcMean(flightJitters, 30.0);
 
-      if (computedVelocities.length >= 2) {
-        for (let i = 1; i < computedVelocities.length; i++) {
-          const accel = Math.abs(computedVelocities[i] - computedVelocities[i - 1]);
-          computedJerks.push(accel);
-        }
+    // --- 5. Backspace / Correction Rate ---
+    const correctionCount = keystrokes.filter((k) => {
+      const key = (k.key || '').toLowerCase();
+      return key === 'backspace' || key === 'delete';
+    }).length;
+    const backspaceRate = keystrokes.length > 0 ? correctionCount / keystrokes.length : 0.05;
+
+    // --- 6. Pause Before First Keystroke ---
+    let pauseBeforeFirstKeystroke = 350.0;
+    if (keystrokes.length > 0) {
+      const firstKeyTime = keystrokes[0].timestamp || 0;
+      if (mousePoints.length > 0 && (mousePoints[0].t !== undefined || mousePoints[0].timestamp !== undefined)) {
+        const firstMouseTime = mousePoints[0].t ?? mousePoints[0].timestamp;
+        const diff = Math.abs(firstKeyTime - firstMouseTime);
+        pauseBeforeFirstKeystroke = Math.min(Math.max(diff, 10.0), 3000.0);
+      } else if (keystrokes[0].flightTime) {
+        pauseBeforeFirstKeystroke = Math.min(Math.max(keystrokes[0].flightTime, 50.0), 2000.0);
       }
-
-      const directDist = Math.hypot(
-        mousePoints[mousePoints.length - 1].x - mousePoints[0].x,
-        mousePoints[mousePoints.length - 1].y - mousePoints[0].y,
-      );
-      straightness = totalLen > 0 ? directDist / totalLen : 0.40;
     }
 
-    const mouseVelMean = computedVelocities.length ? calcMean(computedVelocities) : 850.0;
-    const mouseVelStd = computedVelocities.length ? calcStd(computedVelocities, mouseVelMean) : 200.0;
-    const mouseJerkMean = computedJerks.length ? calcMean(computedJerks) : 45.0;
+    // --- 7. Typing Speed (Characters Per Minute) ---
+    let typingSpeedCPM = 240.0;
+    if (keystrokes.length >= 2) {
+      const tStart = keystrokes[0].timestamp || 0;
+      const tEnd = keystrokes[keystrokes.length - 1].timestamp || 0;
+      const durationMin = (tEnd - tStart) / 60000;
+      if (durationMin > 0.001) {
+        typingSpeedCPM = Math.min(Math.max(keystrokes.length / durationMin, 30.0), 1200.0);
+      }
+    }
+
+    // --- 8. Dwell to Flight Ratio ---
+    const dwellToFlightRatio = flightMean > 0 ? dwellMean / flightMean : 0.78;
+
+    // --- 9. Mouse Dynamics (Velocity, Acceleration, Jerk, Angles, Pauses) ---
+    const velocities: number[] = [];
+    const accelerations: number[] = [];
+    const jerks: number[] = [];
+    const angleChanges: number[] = [];
+    let pauseSamples = 0;
+    let totalPathLen = 0;
+    let totalDurationS = 0;
+
+    const clicks: number[] = [];
+    for (let i = 0; i < mousePoints.length; i++) {
+      const p = mousePoints[i];
+      if (p.type === 'click') {
+        clicks.push(p.t || p.timestamp || 0);
+      }
+    }
+
+    if (mousePoints.length >= 2) {
+      const angles: number[] = [];
+
+      for (let i = 1; i < mousePoints.length; i++) {
+        const p0 = mousePoints[i - 1];
+        const p1 = mousePoints[i];
+        const dist = Math.hypot(p1.x - p0.x, p1.y - p0.y);
+        totalPathLen += dist;
+
+        const t0 = p0.t ?? p0.timestamp;
+        const t1 = p1.t ?? p1.timestamp;
+        const dt = t0 && t1 && t1 > t0 ? (t1 - t0) / 1000 : 0.016;
+        totalDurationS += dt;
+
+        const vel = dt > 0 ? dist / dt : 0;
+        velocities.push(vel);
+
+        if (vel < 50.0) {
+          pauseSamples++;
+        }
+
+        const angle = Math.atan2(p1.y - p0.y, p1.x - p0.x);
+        angles.push(angle);
+      }
+
+      if (velocities.length >= 2) {
+        for (let i = 1; i < velocities.length; i++) {
+          const t0 = mousePoints[i - 1].t ?? mousePoints[i - 1].timestamp;
+          const t1 = mousePoints[i].t ?? mousePoints[i].timestamp;
+          const dt = t0 && t1 && t1 > t0 ? (t1 - t0) / 1000 : 0.016;
+          const accel = dt > 0 ? Math.abs(velocities[i] - velocities[i - 1]) / dt : 0;
+          accelerations.push(accel);
+        }
+      }
+
+      if (accelerations.length >= 2) {
+        for (let i = 1; i < accelerations.length; i++) {
+          const t0 = mousePoints[i - 1].t ?? mousePoints[i - 1].timestamp;
+          const t1 = mousePoints[i].t ?? mousePoints[i].timestamp;
+          const dt = t0 && t1 && t1 > t0 ? (t1 - t0) / 1000 : 0.016;
+          const jerk = dt > 0 ? Math.abs(accelerations[i] - accelerations[i - 1]) / dt : 0;
+          jerks.push(jerk / 1000);
+        }
+      }
+
+      if (angles.length >= 2) {
+        for (let i = 1; i < angles.length; i++) {
+          let diff = Math.abs(angles[i] - angles[i - 1]);
+          if (diff > Math.PI) diff = 2 * Math.PI - diff;
+          angleChanges.push(diff);
+        }
+      }
+    }
+
+    const mouseVelMean = calcMean(velocities, 850.0);
+    const mouseVelStd = calcStd(velocities, mouseVelMean, 200.0);
+    const mouseAccelMean = calcMean(accelerations, 2500.0);
+    const mouseAccelStd = calcStd(accelerations, mouseAccelMean, 1200.0);
+    const mouseJerkMean = calcMean(jerks, 45.0);
+    const mouseJerkStd = calcStd(jerks, mouseJerkMean, 30.0);
+
+    const directDist =
+      mousePoints.length >= 2
+        ? Math.hypot(
+            mousePoints[mousePoints.length - 1].x - mousePoints[0].x,
+            mousePoints[mousePoints.length - 1].y - mousePoints[0].y,
+          )
+        : 0;
+
+    const straightness = totalPathLen > 0 ? Math.min(1.0, directDist / totalPathLen) : 0.40;
+    const curvature = Math.round((1 - straightness) * 100) / 100;
+
+    const totalAngleChange = angleChanges.reduce((a, b) => a + b, 0);
+    const mouseAngleChangeRate = totalDurationS > 0 ? totalAngleChange / totalDurationS : 2.8;
+
+    const mousePauseRatio = velocities.length > 0 ? pauseSamples / velocities.length : 0.18;
+
+    // --- 10. Click to Click Duration ---
+    const clickIntervals: number[] = [];
+    if (clicks.length >= 2) {
+      for (let i = 1; i < clicks.length; i++) {
+        clickIntervals.push(Math.abs(clicks[i] - clicks[i - 1]));
+      }
+    }
+    const clickToClickDurationMean = calcMean(clickIntervals, 650.0);
+    const clickToClickDurationStd = calcStd(clickIntervals, clickToClickDurationMean, 180.0);
+
+    // --- 11. Mouse Path Efficiency ---
+    const mousePathEfficiency =
+      totalPathLen > 0 ? Math.min(1.0, directDist / (totalPathLen + totalAngleChange * 10)) : 0.65;
 
     return {
+      // 10 Keystroke Features
       keystrokeDwellMean: Math.round(dwellMean * 10) / 10,
       keystrokeDwellStd: Math.round(dwellStd * 10) / 10,
       keystrokeFlightMean: Math.round(flightMean * 10) / 10,
       keystrokeFlightStd: Math.round(flightStd * 10) / 10,
+      keystrokeFlightCV: Math.round(flightCV * 1000) / 1000,
+      interKeystrokeJitter: Math.round(interKeystrokeJitter * 10) / 10,
+      backspaceRate: Math.round(backspaceRate * 1000) / 1000,
+      pauseBeforeFirstKeystroke: Math.round(pauseBeforeFirstKeystroke * 10) / 10,
+      typingSpeedCPM: Math.round(typingSpeedCPM * 10) / 10,
+      dwellToFlightRatio: Math.round(dwellToFlightRatio * 1000) / 1000,
+
+      // 13 Mouse Features
       mouseVelocityMean: Math.round(mouseVelMean * 10) / 10,
       mouseVelocityStd: Math.round(mouseVelStd * 10) / 10,
+      mouseAccelerationMean: Math.round(mouseAccelMean * 10) / 10,
+      mouseAccelerationStd: Math.round(mouseAccelStd * 10) / 10,
       mouseJerkMean: Math.round(mouseJerkMean * 10) / 10,
-      mouseCurvatureMean: Math.round((1 - straightness) * 100) / 100,
+      mouseJerkStd: Math.round(mouseJerkStd * 10) / 10,
+      mouseCurvatureMean: Math.round(curvature * 100) / 100,
       mouseStraightnessIndex: Math.round(straightness * 100) / 100,
+      mouseAngleChangeRate: Math.round(mouseAngleChangeRate * 100) / 100,
+      mousePauseRatio: Math.round(mousePauseRatio * 1000) / 1000,
+      clickToClickDurationMean: Math.round(clickToClickDurationMean * 10) / 10,
+      clickToClickDurationStd: Math.round(clickToClickDurationStd * 10) / 10,
+      mousePathEfficiency: Math.round(mousePathEfficiency * 100) / 100,
+
       sampleCount: keystrokes.length + mousePoints.length,
     };
   }

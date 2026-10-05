@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchApi } from './api-client';
+import { billingApi } from './api-client';
 
 export type PlanType = 'starter' | 'pro' | 'enterprise';
 
@@ -70,7 +70,7 @@ export function useSubscription() {
     }
 
     // Backend sync
-    fetchApi('/billing/status').then((res) => {
+    billingApi.getStatus().then((res: any) => {
       if (res?.success) {
         setSubState((prev) => ({
           ...prev,

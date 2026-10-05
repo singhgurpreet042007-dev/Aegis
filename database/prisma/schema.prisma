@@ -76,20 +76,39 @@ model WorkspaceMember {
 }
 
 model BehavioralBaseline {
-  id                  String   @id @default(uuid())
-  userId              String   @unique
-  keystrokeDwellMean  Float    @default(0.0)
-  keystrokeDwellStd   Float    @default(0.0)
-  keystrokeFlightMean Float    @default(0.0)
-  keystrokeFlightStd  Float    @default(0.0)
-  mouseVelocityMean   Float    @default(0.0)
-  mouseVelocityStd    Float    @default(0.0)
-  mouseJerkMean       Float    @default(0.0)
-  mouseCurvatureMean  Float    @default(0.0)
-  sampleCount         Int      @default(0)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @default(now()) @updatedAt
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                        String   @id @default(uuid())
+  userId                    String   @unique
+  // 10 Keystroke Dynamics Baseline Features
+  keystrokeDwellMean        Float    @default(0.0)
+  keystrokeDwellStd         Float    @default(0.0)
+  keystrokeFlightMean       Float    @default(0.0)
+  keystrokeFlightStd        Float    @default(0.0)
+  keystrokeFlightCV         Float    @default(0.0)
+  interKeystrokeJitter      Float    @default(0.0)
+  backspaceRate             Float    @default(0.0)
+  pauseBeforeFirstKeystroke Float    @default(0.0)
+  typingSpeedCPM            Float    @default(0.0)
+  dwellToFlightRatio        Float    @default(0.0)
+
+  // 13 Mouse Dynamics Baseline Features
+  mouseVelocityMean         Float    @default(0.0)
+  mouseVelocityStd          Float    @default(0.0)
+  mouseAccelerationMean     Float    @default(0.0)
+  mouseAccelerationStd      Float    @default(0.0)
+  mouseJerkMean             Float    @default(0.0)
+  mouseJerkStd              Float    @default(0.0)
+  mouseCurvatureMean        Float    @default(0.0)
+  mouseStraightnessIndex    Float    @default(0.0)
+  mouseAngleChangeRate      Float    @default(0.0)
+  mousePauseRatio           Float    @default(0.0)
+  clickToClickDurationMean  Float    @default(0.0)
+  clickToClickDurationStd   Float    @default(0.0)
+  mousePathEfficiency       Float    @default(0.0)
+
+  sampleCount               Int      @default(0)
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @default(now()) @updatedAt
+  user                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model BehavioralSession {

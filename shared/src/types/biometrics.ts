@@ -49,15 +49,34 @@ export interface MouseTrajectoryPoint {
 }
 
 export interface ComputedBiometricFeatures {
+  // 10 Keystroke Dynamics Features
   keystrokeDwellMean: number;
   keystrokeDwellStd: number;
   keystrokeFlightMean: number;
   keystrokeFlightStd: number;
+  keystrokeFlightCV: number;
+  interKeystrokeJitter: number;
+  backspaceRate: number;
+  pauseBeforeFirstKeystroke: number;
+  typingSpeedCPM: number;
+  dwellToFlightRatio: number;
+
+  // 13 Mouse Dynamics Features
   mouseVelocityMean: number;
   mouseVelocityStd: number;
+  mouseAccelerationMean: number;
+  mouseAccelerationStd: number;
   mouseJerkMean: number;
+  mouseJerkStd: number;
   mouseCurvatureMean: number;
   mouseStraightnessIndex: number;
+  mouseAngleChangeRate: number;
+  mousePauseRatio: number;
+  clickToClickDurationMean: number;
+  clickToClickDurationStd: number;
+  mousePathEfficiency: number;
+
+  // Telemetry Sample Count
   sampleCount: number;
 }
 

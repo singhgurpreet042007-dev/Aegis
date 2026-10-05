@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Play, Bot, Zap, CheckCircle2, UserCheck, ShieldAlert, Globe } from 'lucide-react';
-import { SimulationResult } from '@/shared';
+import { SimulationResult, SimulatorScenario } from '@/shared';
 import { useConnectedWebsite } from '@/lib/aegis-website';
-import { globalTelemetryTracker } from '@/lib/telemetry-tracker';
+import { globalTelemetryTracker, TelemetryTracker } from '@/lib/telemetry-tracker';
+import { intruderApi } from '@/lib/api-client';
 
 interface IntruderSimulatorViewProps {
   onSimulationComplete?: (result: SimulationResult) => void;
@@ -37,72 +38,112 @@ export function IntruderSimulatorView({ onSimulationComplete, sessionId, userId 
       id: 'bot' as const,
       name: 'Automated Bot Attack',
       icon: Bot,
-      detail: 'Dispatches synthetic straight diagonal 16ms mouse vectors and 10ms zero-jitter keystrokes over WebSocket.',
-      expectedRisk: '0.92 (HIGH)',
+      detail: 'Dispatches synthetic straight diagonal 16ms mouse vectors and 10ms zero-jitter keystrokes over WebSocket & HTTP.',
+      expectedRisk: '0.85 - 0.95 (CRITICAL)',
     },
     {
       id: 'stuffing' as const,
       name: 'Credential Stuffing Burst',
       icon: ShieldAlert,
-      detail: 'Simulates rapid automated form submission attempts with fixed 5ms inter-key latency.',
-      expectedRisk: '0.96 (CRITICAL)',
+      detail: 'Simulates rapid automated form submission attempts with fixed 5ms inter-key latency and robotic straight movement.',
+      expectedRisk: '0.88 - 0.98 (CRITICAL)',
     },
     {
       id: 'hijack' as const,
-      name: 'Session Hijack / Token Transfer',
+      name: 'Session Hijack / Account Takeover',
       icon: Zap,
-      detail: 'Simulates a sudden shift in hardware WebGL canvas fingerprint mid-session.',
-      expectedRisk: '0.84 (HIGH)',
+      detail: 'Simulates a sudden shift in typing velocity and abnormal cadence mid-session from an untrusted device.',
+      expectedRisk: '0.75 - 0.85 (HIGH)',
     },
     {
       id: 'human' as const,
       name: 'Legitimate Human Baseline',
       icon: UserCheck,
-      detail: 'Simulates organic curved mouse trajectory with natural 110ms key dwell latency.',
-      expectedRisk: '0.08 (LOW)',
+      detail: 'Simulates organic curved mouse trajectory with natural 110ms key dwell latency and standard variance.',
+      expectedRisk: '0.04 - 0.12 (LOW)',
     },
   ];
 
   const handleRunSimulation = async (scenario: 'bot' | 'stuffing' | 'hijack' | 'human') => {
     setIsRunning(true);
-    try {
-      if (scenario === 'bot' || scenario === 'stuffing' || scenario === 'hijack') {
-        // Feature 3: Programmatic synthetic bot input over WebSocket pipeline
-        globalTelemetryTracker.simulateBotAttackBatch({
-          pointCount: 50,
-          startX: 80,
-          startY: 80,
-        });
+    const targetSessionId = sessionId || 'sess_demo_default';
+    const targetUserId = userId || 'usr_demo_default';
 
-        setTimeout(() => {
-          const simulated: SimulationResult = {
-            anomalyDetected: true,
-            riskScore: scenario === 'bot' ? 0.92 : scenario === 'stuffing' ? 0.96 : 0.84,
-            riskLevel: 'HIGH',
-            mfaChallenged: true,
-            featuresFlagged: ['Mouse Linearity (Robotic Vector)', 'Zero-Jitter Keystrokes'],
-            explanation: `Simulated ${scenario.toUpperCase()} attack dispatched real synthetic straight-line 16ms events over WebSocket pipeline.`,
-            scenarioExecuted: scenario,
-          };
-          setLastResult(simulated);
-          if (onSimulationComplete) onSimulationComplete(simulated);
-          setIsRunning(false);
-        }, 800);
-      } else {
-        const simulated: SimulationResult = {
-          anomalyDetected: false,
-          riskScore: 0.08,
-          riskLevel: 'LOW',
-          mfaChallenged: false,
-          featuresFlagged: [],
-          explanation: 'Normal organic human baseline movement.',
+    const scenarioMap: Record<'bot' | 'stuffing' | 'hijack' | 'human', SimulatorScenario> = {
+      bot: SimulatorScenario.BOT_ATTACK,
+      stuffing: SimulatorScenario.CREDENTIAL_STUFFING,
+      hijack: SimulatorScenario.SESSION_HIJACK,
+      human: SimulatorScenario.NORMAL_USER,
+    };
+
+    const chosenScenario = scenarioMap[scenario];
+
+    try {
+      // 1. Dispatch authentic synthetic telemetry batch into telemetry tracker
+      const generatedBatch = globalTelemetryTracker.simulateAttack(chosenScenario);
+      const computedFeatures = TelemetryTracker.extractFeatures(
+        generatedBatch.keystrokes,
+        generatedBatch.mousePoints
+      );
+
+      // 2. Query NestJS Backend Intruder endpoint for real AI risk engine evaluation
+      const backendRes: any = await intruderApi.simulate(targetSessionId, targetUserId, chosenScenario);
+
+      let result: SimulationResult;
+
+      if (backendRes && !backendRes.error && (backendRes.riskScore !== undefined || backendRes.overallRiskScore !== undefined)) {
+        const score = backendRes.riskScore ?? backendRes.overallRiskScore;
+        result = {
+          anomalyDetected: backendRes.anomalyDetected ?? score >= 0.5,
+          riskScore: score,
+          riskLevel: backendRes.riskLevel || (score >= 0.85 ? 'CRITICAL' : score >= 0.6 ? 'HIGH' : 'LOW'),
+          mfaChallenged: backendRes.mfaChallenged ?? backendRes.adaptiveMfaRequired ?? (score >= 0.6),
+          featuresFlagged: backendRes.featuresFlagged || (backendRes.explainableFactors?.map((f: any) => f.feature || f.featureName) ?? []),
+          explanation: backendRes.explanation || `Executed ${chosenScenario} simulation via backend IsolationForest + weighted rule engine.`,
           scenarioExecuted: scenario,
         };
-        setLastResult(simulated);
-        if (onSimulationComplete) onSimulationComplete(simulated);
-        setIsRunning(false);
+      } else {
+        // Fallback: Client-side local multi-factor evaluation using genuine extracted features
+        const localEval = TelemetryTracker.evaluateLocalRisk(
+          computedFeatures,
+          undefined,
+          scenario === 'human'
+        );
+
+        result = {
+          anomalyDetected: localEval.riskLevel !== 'LOW',
+          riskScore: localEval.overallRiskScore,
+          riskLevel: localEval.riskLevel,
+          mfaChallenged: localEval.adaptiveMfaRequired,
+          featuresFlagged: localEval.explainableFactors.map((f: any) => f.feature),
+          explanation: `Locally evaluated ${scenario} telemetry: Risk score ${localEval.overallRiskScore.toFixed(2)} (${localEval.riskLevel}).`,
+          scenarioExecuted: scenario,
+        };
       }
-    } catch {
+
+      setLastResult(result);
+      if (onSimulationComplete) onSimulationComplete(result);
+    } catch (err: any) {
+      console.warn('[Simulation] Error executing simulation:', err);
+      // Local fallback on error
+      const generatedBatch = globalTelemetryTracker.simulateAttack(chosenScenario);
+      const computedFeatures = TelemetryTracker.extractFeatures(
+        generatedBatch.keystrokes,
+        generatedBatch.mousePoints
+      );
+      const localEval = TelemetryTracker.evaluateLocalRisk(computedFeatures, undefined, scenario === 'human');
+      const fallbackResult: SimulationResult = {
+        anomalyDetected: localEval.riskLevel !== 'LOW',
+        riskScore: localEval.overallRiskScore,
+        riskLevel: localEval.riskLevel,
+        mfaChallenged: localEval.adaptiveMfaRequired,
+        featuresFlagged: localEval.explainableFactors.map((f: any) => f.feature),
+        explanation: `Locally evaluated ${scenario} telemetry: Risk score ${localEval.overallRiskScore.toFixed(2)} (${localEval.riskLevel}).`,
+        scenarioExecuted: scenario,
+      };
+      setLastResult(fallbackResult);
+      if (onSimulationComplete) onSimulationComplete(fallbackResult);
+    } finally {
       setIsRunning(false);
     }
   };

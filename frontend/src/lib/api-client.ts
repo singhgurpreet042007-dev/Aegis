@@ -105,3 +105,233 @@ export async function fetchApi<T = any>(endpoint: string, options: ApiFetchOptio
     };
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  Typed API Services Matching Backend Endpoints
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const biometricsApi = {
+  ingest: (payload: {
+    sessionId: string;
+    userId: string;
+    keystrokes?: any[];
+    mousePoints?: any[];
+    deviceFingerprint?: any;
+    is_baseline?: boolean;
+    isSimulated?: boolean;
+    simulationType?: string;
+  }) => fetchApi('/v1/biometrics/ingest', { method: 'POST', body: JSON.stringify(payload) }),
+
+  finalizeCalibration: (userId: string, sessionId: string) =>
+    fetchApi('/v1/biometrics/calibrate/complete', { method: 'POST', body: JSON.stringify({ userId, sessionId }) }),
+
+  getSessionStatus: (sessionId: string) =>
+    fetchApi(`/v1/biometrics/session/${encodeURIComponent(sessionId)}`, { method: 'GET' }),
+
+  getSessionMousePath: (sessionId: string) =>
+    fetchApi(`/v1/biometrics/session/${encodeURIComponent(sessionId)}/mouse-path`, { method: 'GET' }),
+
+  getAllSessions: () =>
+    fetchApi('/v1/biometrics/sessions', { method: 'GET' }),
+
+  getBaseline: (userId: string) =>
+    fetchApi(`/v1/biometrics/baseline/${encodeURIComponent(userId)}`, { method: 'GET' }),
+
+  // Compatibility helpers
+  calibrate: (userId: string, sampleData: any) =>
+    fetchApi('/v1/biometrics/calibrate', { method: 'POST', body: JSON.stringify({ userId, sampleData }) }),
+
+  resetBaseline: (userId: string) =>
+    fetchApi(`/v1/biometrics/baseline/${encodeURIComponent(userId)}`, { method: 'DELETE' }),
+
+  getSessionTelemetry: (sessionId: string) =>
+    fetchApi(`/v1/biometrics/session/${encodeURIComponent(sessionId)}/telemetry`, { method: 'GET' }),
+};
+
+export const riskApi = {
+  getDashboardMetrics: () =>
+    fetchApi('/v1/risk/dashboard-metrics', { method: 'GET' }),
+
+  getActiveSessions: () =>
+    fetchApi('/v1/risk/active-sessions', { method: 'GET' }),
+
+  getThreatMap: () =>
+    fetchApi('/v1/risk/threat-map', { method: 'GET' }),
+
+  evaluate: (payload: {
+    sessionId: string;
+    userId: string;
+    currentFeatures: Record<string, number>;
+    baselineFeatures?: Record<string, number>;
+    deviceTrusted?: boolean;
+    isSimulated?: boolean;
+    simulationType?: string;
+  }) => fetchApi('/v1/risk/evaluate', { method: 'POST', body: JSON.stringify(payload) }),
+
+  getHistory: (userId: string) =>
+    fetchApi(`/v1/risk/history/${encodeURIComponent(userId)}`, { method: 'GET' }),
+
+  getAssessment: (assessmentId: string) =>
+    fetchApi(`/v1/risk/assessment/${encodeURIComponent(assessmentId)}`, { method: 'GET' }),
+};
+
+export const sentinelApi = {
+  scanAndRegisterUrl: (url: string, userEmail?: string) =>
+    fetchApi('/v1/sentinel/scan-url', { method: 'POST', body: JSON.stringify({ url, userEmail }) }),
+
+  getPostureReport: (params?: { domain?: string; url?: string }) => {
+    const q = new URLSearchParams();
+    if (params?.domain) q.set('domain', params.domain);
+    if (params?.url) q.set('url', params.url);
+    const qs = q.toString() ? `?${q.toString()}` : '';
+    return fetchApi(`/v1/sentinel/posture-report${qs}`, { method: 'GET' });
+  },
+
+  detectAndProcessEvent: (eventData: {
+    domain: string;
+    eventType: string;
+    targetUrl?: string;
+    userEmail?: string;
+    deviceInfo?: string;
+    browser?: string;
+    os?: string;
+    ipAddress?: string;
+    location?: string;
+    details?: string;
+    rawMetadata?: Record<string, any>;
+  }) => fetchApi('/v1/sentinel/detect-event', { method: 'POST', body: JSON.stringify(eventData) }),
+
+  verifyLogin: (incidentId: string, action: 'VERIFIED' | 'COMPROMISED') =>
+    fetchApi('/v1/sentinel/verify-login', { method: 'POST', body: JSON.stringify({ incidentId, action }) }),
+
+  getIncidents: (domain?: string) => {
+    const qs = domain ? `?domain=${encodeURIComponent(domain)}` : '';
+    return fetchApi(`/v1/sentinel/incidents${qs}`, { method: 'GET' });
+  },
+
+  getIncidentById: (id: string) =>
+    fetchApi(`/v1/sentinel/incidents/${encodeURIComponent(id)}`, { method: 'GET' }),
+
+  handleIncidentAction: (id: string, action: 'VERIFIED' | 'COMPROMISED') =>
+    fetchApi(`/v1/sentinel/incidents/${encodeURIComponent(id)}/action`, {
+      method: 'POST',
+      body: JSON.stringify({ action }),
+    }),
+
+  getTrustedContexts: (domain?: string) => {
+    const qs = domain ? `?domain=${encodeURIComponent(domain)}` : '';
+    return fetchApi(`/v1/sentinel/trusted-contexts${qs}`, { method: 'GET' });
+  },
+
+  revokeTrustedContext: (id: string) =>
+    fetchApi(`/v1/sentinel/trusted-contexts/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+
+  disconnectDomain: (domain: string) =>
+    fetchApi('/v1/sentinel/disconnect', { method: 'POST', body: JSON.stringify({ domain }) }),
+
+  getAllMonitoredUrls: () =>
+    fetchApi('/v1/sentinel/monitored-urls', { method: 'GET' }),
+
+  toggleUrlStatus: (id: string) =>
+    fetchApi(`/v1/sentinel/${encodeURIComponent(id)}/toggle`, { method: 'PATCH' }),
+
+  pingUrlNow: (id: string) =>
+    fetchApi(`/v1/sentinel/${encodeURIComponent(id)}/ping`, { method: 'POST' }),
+
+  executeAction: (data: {
+    sessionId: string;
+    action: 'TERMINATE_SESSION' | 'LOCK_ACCOUNT' | 'STEP_UP_MFA' | 'DECOY_CONTAINMENT';
+    reason?: string;
+  }) => fetchApi('/v1/sentinel/action', { method: 'POST', body: JSON.stringify(data) }),
+
+  getActions: (sessionId: string) =>
+    fetchApi(`/v1/sentinel/actions/${encodeURIComponent(sessionId)}`, { method: 'GET' }),
+};
+
+export const intruderApi = {
+  simulate: (sessionId: string, userId: string, scenario: string) =>
+    fetchApi('/v1/intruder/simulate', {
+      method: 'POST',
+      body: JSON.stringify({ sessionId, userId, scenario }),
+    }),
+
+  getHistory: () => fetchApi('/v1/intruder/history', { method: 'GET' }),
+
+  getScenarios: () => fetchApi('/v1/intruder/scenarios', { method: 'GET' }),
+};
+
+export const sessionReplayApi = {
+  getReplay: (sessionId: string) =>
+    fetchApi(`/v1/session-replay/${encodeURIComponent(sessionId)}`, { method: 'GET' }),
+
+  exportReplay: (sessionId: string) =>
+    fetchApi(`/v1/session-replay/${encodeURIComponent(sessionId)}/export`, { method: 'POST' }),
+};
+
+export const alertsApi = {
+  getAlerts: (limit: number = 50) =>
+    fetchApi(`/v1/alerts?limit=${limit}`, { method: 'GET' }),
+
+  updateStatus: (alertId: string, status: string) =>
+    fetchApi(`/v1/alerts/${encodeURIComponent(alertId)}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    }),
+
+  getThreatMapPoints: () =>
+    fetchApi('/v1/alerts/threat-map', { method: 'GET' }),
+
+  resolve: (alertId: string, notes?: string) =>
+    fetchApi(`/v1/alerts/${encodeURIComponent(alertId)}/resolve`, {
+      method: 'POST',
+      body: JSON.stringify({ resolutionNotes: notes }),
+    }),
+
+  getStats: () => fetchApi('/v1/alerts/stats', { method: 'GET' }),
+};
+
+export const authApi = {
+  sendOtp: (email: string) =>
+    fetchApi('/auth/send-otp', { method: 'POST', body: JSON.stringify({ email }) }),
+
+  verifyOtp: (email: string, code: string) =>
+    fetchApi('/auth/verify-otp', { method: 'POST', body: JSON.stringify({ email, code }) }),
+
+  resetPassword: (dto: { email: string; otpCode: string; newPassword: string }) =>
+    fetchApi('/auth/reset-password', { method: 'POST', body: JSON.stringify(dto) }),
+
+  register: (userData: { email: string; name?: string; password?: string; organizationName?: string; otpCode?: string }) =>
+    fetchApi('/auth/register', { method: 'POST', body: JSON.stringify(userData) }),
+
+  login: (credentials: { email: string; password?: string; otpCode?: string }) =>
+    fetchApi('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
+
+  refresh: (refreshToken: string) =>
+    fetchApi('/auth/refresh', { method: 'POST', body: JSON.stringify({ refreshToken }) }),
+
+  logout: () =>
+    fetchApi('/auth/logout', { method: 'POST' }),
+
+  getMe: () =>
+    fetchApi('/auth/me', { method: 'GET' }),
+
+  challengeMfa: (sessionId: string) =>
+    fetchApi('/auth/mfa/challenge', { method: 'POST', body: JSON.stringify({ sessionId }) }),
+
+  verifyMfa: (sessionId: string, code: string) =>
+    fetchApi('/auth/mfa/verify', { method: 'POST', body: JSON.stringify({ sessionId, code }) }),
+};
+
+export const billingApi = {
+  claimTrial: (dto: { email: string; name?: string; organization?: string }) =>
+    fetchApi('/api/billing/claim-trial', { method: 'POST', body: JSON.stringify(dto) }),
+
+  checkout: (dto: { planId: string; email: string }) =>
+    fetchApi('/api/billing/checkout', { method: 'POST', body: JSON.stringify(dto) }),
+
+  verifyPayment: (dto: { paymentIntentId: string; sessionId?: string }) =>
+    fetchApi('/api/billing/verify-payment', { method: 'POST', body: JSON.stringify(dto) }),
+
+  getStatus: () =>
+    fetchApi('/api/billing/status', { method: 'GET' }),
+};

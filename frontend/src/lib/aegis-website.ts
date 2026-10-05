@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchApi } from './api-client';
+import { sentinelApi } from './api-client';
 
 export interface ConnectedWebsite {
   url: string;
@@ -49,10 +49,7 @@ export async function connectWebsite(targetUrl: string, userEmail?: string): Pro
 
   // Try calling NestJS Backend API
   try {
-    const res = await fetchApi('/sentinel/scan-url', {
-      method: 'POST',
-      body: JSON.stringify({ url: formattedUrl, userEmail }),
-    });
+    const res: any = await sentinelApi.scanAndRegisterUrl(formattedUrl, userEmail);
 
     if (res && res.data) {
       siteId = res.data.siteId || siteId;

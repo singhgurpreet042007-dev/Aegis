@@ -73,7 +73,7 @@ async function main() {
     },
   });
 
-  // Behavioral Baseline
+  // Behavioral Baseline (23-dimensional feature baseline)
   await prisma.behavioralBaseline.create({
     data: {
       userId: demoUser.id,
@@ -81,10 +81,25 @@ async function main() {
       keystrokeDwellStd: 22.1,
       keystrokeFlightMean: 138.5,
       keystrokeFlightStd: 31.8,
+      keystrokeFlightCV: 0.229,
+      interKeystrokeJitter: 28.1,
+      backspaceRate: 0.05,
+      pauseBeforeFirstKeystroke: 330.0,
+      typingSpeedCPM: 242.0,
+      dwellToFlightRatio: 0.811,
       mouseVelocityMean: 840.2,
       mouseVelocityStd: 195.4,
+      mouseAccelerationMean: 2470.0,
+      mouseAccelerationStd: 1190.0,
       mouseJerkMean: 42.1,
+      mouseJerkStd: 29.8,
       mouseCurvatureMean: 0.39,
+      mouseStraightnessIndex: 0.41,
+      mouseAngleChangeRate: 2.78,
+      mousePauseRatio: 0.17,
+      clickToClickDurationMean: 635.0,
+      clickToClickDurationStd: 178.0,
+      mousePathEfficiency: 0.67,
       sampleCount: 450,
     },
   });
